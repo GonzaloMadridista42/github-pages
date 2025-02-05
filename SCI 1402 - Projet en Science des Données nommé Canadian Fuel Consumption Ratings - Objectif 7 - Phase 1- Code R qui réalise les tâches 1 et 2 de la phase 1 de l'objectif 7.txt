@@ -1,0 +1,355 @@
+# Installation et chargement des bibliothèques nécessaires
+install.packages("dplyr")
+install.packages("ggplot2")
+install.packages("readr")
+
+library(dplyr)
+library(ggplot2)
+library(readr)
+
+# Option pour afficher toutes les colonnes dans la console
+options(tibble.width = Inf)  # Affiche toutes les colonnes sans limite
+
+# Spécifier le chemin où se trouvent vos fichiers CSV
+chemin_donnees <- "C:/Users/lalop/OneDrive/Documentos/SCI 1402/"
+
+# Liste des fichiers CSV des échantillons
+fichiers_echantillons <- c('Sample_1_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2017_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2017_Fuel_Consumption_Ratings.csv',
+                           'Sample_1_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2023_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2023_Fuel_Consumption_Ratings.csv')
+
+# Boucle pour calculer et exporter les statistiques descriptives par échantillon et par année
+for (fichier in fichiers_echantillons) {
+  # Lire les données
+  data <- read_csv(paste0(chemin_donnees, fichier))
+  
+  # Extraire l'année et le type d'échantillon depuis le nom du fichier
+  annee <- gsub(".*MY([0-9]{4}).*", "\\1", fichier)
+  sample_type <- ifelse(grepl("Sample_1", fichier), "Sample_1", "Sample_2")
+  
+  # Calcul des statistiques descriptives
+  statistiques_descriptives <- data %>%
+    summarize(
+      Moyenne_CO2 = mean(`CO2 Emissions (g/km)`, na.rm = TRUE),
+      Mediane_CO2 = median(`CO2 Emissions (g/km)`, na.rm = TRUE),
+      Ecart_Type_CO2 = sd(`CO2 Emissions (g/km)`, na.rm = TRUE),
+      Mode_CO2 = as.numeric(names(sort(table(`CO2 Emissions (g/km)`), decreasing = TRUE)[1])),
+      Etendue_CO2 = diff(range(`CO2 Emissions (g/km)`, na.rm = TRUE)),
+      CV_CO2 = sd(`CO2 Emissions (g/km)`, na.rm = TRUE) / mean(`CO2 Emissions (g/km)`, na.rm = TRUE) * 100,
+
+      Moyenne_City = mean(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE),
+      Mediane_City = median(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE),
+      Ecart_Type_City = sd(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE),
+      Mode_City = as.numeric(names(sort(table(`Fuel Consumption (City) (L/100 km)`), decreasing = TRUE)[1])),
+      Etendue_City = diff(range(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE)),
+      CV_City = sd(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE) / mean(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE) * 100,
+
+      Moyenne_Hwy = mean(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE),
+      Mediane_Hwy = median(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE),
+      Ecart_Type_Hwy = sd(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE),
+      Mode_Hwy = as.numeric(names(sort(table(`Fuel Consumption (Hwy) (L/100 km)`), decreasing = TRUE)[1])),
+      Etendue_Hwy = diff(range(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE)),
+      CV_Hwy = sd(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE) / mean(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE) * 100,
+
+      Moyenne_Comb = mean(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE),
+      Mediane_Comb = median(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE),
+      Ecart_Type_Comb = sd(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE),
+      Mode_Comb = as.numeric(names(sort(table(`Fuel Consumption (Comb) (L/100 km)`), decreasing = TRUE)[1])),
+      Etendue_Comb = diff(range(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE)),
+      CV_Comb = sd(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE) / mean(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE) * 100
+    )
+
+  # Générer les noms de fichiers
+  nom_csv <- paste0("Descriptive_Statistics_", sample_type, "_Completed_MY", annee, "_Fuel_Consumption_Ratings.csv")
+  nom_txt <- paste0("Descriptive_Statistics_", sample_type, "_Completed_MY", annee, "_Fuel_Consumption_Ratings.txt")
+  
+  # Exporter vers un fichier CSV
+  write_csv(statistiques_descriptives, paste0(chemin_donnees, nom_csv))
+  
+  # Exporter vers un fichier texte
+  writeLines(capture.output(print(statistiques_descriptives)), paste0(chemin_donnees, nom_txt))
+}
+
+# Calculer les moyennes pour chaque année pour les statistiques descriptives
+moyennes_annuelles <- combined_data %>%
+  group_by(Year) %>%
+  summarize(
+    Moyenne_CO2 = mean(`CO2 Emissions (g/km)`, na.rm = TRUE),
+    Moyenne_City = mean(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE),
+    Moyenne_Hwy = mean(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE),
+    Moyenne_Comb = mean(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE)
+  )
+
+#-------------visualisation des résultats des analyses descriptives englobant toutes les données des échantillons des années 2015 à 2023--------------
+#1. Graphiques à lignes (4 graphiques : City, Hwy, Comb, CO2)
+# City Fuel Consumption (L/100 km)
+ggplot(combined_data, aes(x = Year, y = `Fuel Consumption (City) (L/100 km)`)) +
+  geom_line() +
+  labs(title = "Consommation de carburant en ville par année (2015-2023)", x = "Année", y = "Consommation (L/100 km)") +
+  theme_minimal()
+
+# Hwy Fuel Consumption (L/100 km)
+ggplot(combined_data, aes(x = Year, y = `Fuel Consumption (Hwy) (L/100 km)`)) +
+  geom_line() +
+  labs(title = "Consommation de carburant sur autoroute par année (2015-2023)", x = "Année", y = "Consommation (L/100 km)") +
+  theme_minimal()
+
+# Comb Fuel Consumption (L/100 km)
+ggplot(combined_data, aes(x = Year, y = `Fuel Consumption (Comb) (L/100 km)`)) +
+  geom_line() +
+  labs(title = "Consommation de carburant combinée par année (2015-2023)", x = "Année", y = "Consommation (L/100 km)") +
+  theme_minimal()
+
+# CO2 Emissions (g/km)
+ggplot(combined_data, aes(x = Year, y = `CO2 Emissions (g/km)`)) +
+  geom_line() +
+  labs(title = "Émissions de CO2 par année (2015-2023)", x = "Année", y = "Émissions de CO2 (g/km)") +
+  theme_minimal()
+
+#2. Graphiques à nuage de points (4 graphiques : City, Hwy, Comb, CO2)
+# City Fuel Consumption (L/100 km)
+ggplot(combined_data, aes(x = Year, y = `Fuel Consumption (City) (L/100 km)`)) +
+  geom_point() +
+  labs(title = "Nuage de points - Consommation de carburant en ville (2015-2023)", x = "Année", y = "Consommation (L/100 km)") +
+  theme_minimal()
+
+# Hwy Fuel Consumption (L/100 km)
+ggplot(combined_data, aes(x = Year, y = `Fuel Consumption (Hwy) (L/100 km)`)) +
+  geom_point() +
+  labs(title = "Nuage de points - Consommation de carburant sur autoroute (2015-2023)", x = "Année", y = "Consommation (L/100 km)") +
+  theme_minimal()
+
+# Comb Fuel Consumption (L/100 km)
+ggplot(combined_data, aes(x = Year, y = `Fuel Consumption (Comb) (L/100 km)`)) +
+  geom_point() +
+  labs(title = "Nuage de points - Consommation de carburant combinée (2015-2023)", x = "Année", y = "Consommation (L/100 km)") +
+  theme_minimal()
+
+# CO2 Emissions (g/km)
+ggplot(combined_data, aes(x = Year, y = `CO2 Emissions (g/km)`)) +
+  geom_point() +
+  labs(title = "Nuage de points - Émissions de CO2 (2015-2023)", x = "Année", y = "Émissions de CO2 (g/km)") +
+  theme_minimal()
+
+#3. Graphiques à boîte à moustaches (boxplots) (4 graphiques : City, Hwy, Comb, CO2)
+# City Fuel Consumption (L/100 km)
+ggplot(combined_data, aes(x = factor(Year), y = `Fuel Consumption (City) (L/100 km)`)) +
+  geom_boxplot() +
+  labs(title = "Boîte à moustaches - Consommation de carburant en ville (2015-2023)", x = "Année", y = "Consommation (L/100 km)") +
+  theme_minimal()
+
+# Hwy Fuel Consumption (L/100 km)
+ggplot(combined_data, aes(x = factor(Year), y = `Fuel Consumption (Hwy) (L/100 km)`)) +
+  geom_boxplot() +
+  labs(title = "Boîte à moustaches - Consommation de carburant sur autoroute (2015-2023)", x = "Année", y = "Consommation (L/100 km)") +
+  theme_minimal()
+
+# Comb Fuel Consumption (L/100 km)
+ggplot(combined_data, aes(x = factor(Year), y = `Fuel Consumption (Comb) (L/100 km)`)) +
+  geom_boxplot() +
+  labs(title = "Boîte à moustaches - Consommation de carburant combinée (2015-2023)", x = "Année", y = "Consommation (L/100 km)") +
+  theme_minimal()
+
+# CO2 Emissions (g/km)
+ggplot(combined_data, aes(x = factor(Year), y = `CO2 Emissions (g/km)`)) +
+  geom_boxplot() +
+  labs(title = "Boîte à moustaches - Émissions de CO2 (2015-2023)", x = "Année", y = "Émissions de CO2 (g/km)") +
+  theme_minimal()
+
+#4. Histogrammes sous forme de barres (4 graphiques : City, Hwy, Comb, CO2)
+# City Fuel Consumption (L/100 km)
+ggplot(combined_data, aes(x = `Fuel Consumption (City) (L/100 km)`)) +
+  geom_histogram(binwidth = 0.5, fill = "blue", color = "black") +
+  labs(title = "Histogramme - Consommation de carburant en ville (2015-2023)", x = "Consommation (L/100 km)", y = "Fréquence") +
+  theme_minimal()
+
+# Hwy Fuel Consumption (L/100 km)
+ggplot(combined_data, aes(x = `Fuel Consumption (Hwy) (L/100 km)`)) +
+  geom_histogram(binwidth = 0.5, fill = "green", color = "black") +
+  labs(title = "Histogramme - Consommation de carburant sur autoroute (2015-2023)", x = "Consommation (L/100 km)", y = "Fréquence") +
+  theme_minimal()
+
+# Comb Fuel Consumption (L/100 km)
+ggplot(combined_data, aes(x = `Fuel Consumption (Comb) (L/100 km)`)) +
+  geom_histogram(binwidth = 0.5, fill = "purple", color = "black") +
+  labs(title = "Histogramme - Consommation de carburant combinée (2015-2023)", x = "Consommation (L/100 km)", y = "Fréquence") +
+  theme_minimal()
+
+# CO2 Emissions (g/km)
+ggplot(combined_data, aes(x = `CO2 Emissions (g/km)`)) +
+  geom_histogram(binwidth = 10, fill = "red", color = "black") +
+  labs(title = "Histogramme - Émissions de CO2 (2015-2023)", x = "Émissions de CO2 (g/km)", y = "Fréquence") +
+  theme_minimal()
+
+#5. Graphiques en barres groupées (4 graphiques : City, Hwy, Comb, CO2)
+# City Fuel Consumption (L/100 km)
+ggplot(combined_data, aes(x = factor(Year), y = `Fuel Consumption (City) (L/100 km)`, fill = `Fuel Type`)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Barres groupées - Consommation de carburant en ville (2015-2023)", x = "Année", y = "Consommation (L/100 km)") +
+  theme_minimal()
+
+# Hwy Fuel Consumption (L/100 km)
+ggplot(combined_data, aes(x = factor(Year), y = `Fuel Consumption (Hwy) (L/100 km)`, fill = `Fuel Type`)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Barres groupées - Consommation de carburant sur autoroute (2015-2023)", x = "Année", y = "Consommation (L/100 km)") +
+  theme_minimal()
+
+# Comb Fuel Consumption (L/100 km)
+ggplot(combined_data, aes(x = factor(Year), y = `Fuel Consumption (Comb) (L/100 km)`, fill = `Fuel Type`)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Barres groupées - Consommation de carburant combinée (2015-2023)", x = "Année", y = "Consommation (L/100 km)") +
+  theme_minimal()
+
+# CO2 Emissions (g/km)
+ggplot(combined_data, aes(x = factor(Year), y = `CO2 Emissions (g/km)`, fill = `Fuel Type`)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Barres groupées - Émissions de CO2 (2015-2023)", x = "Année", y = "Émissions de CO2 (g/km)") +
+  theme_minimal()
+
+#6. Graphiques à lignes pour la corrélation de Pearson (4 graphiques : City, Hwy, Comb, CO2)
+# City Fuel Consumption vs Year
+ggplot(moyennes_annuelles, aes(x = Year, y = Moyenne_City)) +
+  geom_line() +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") +
+  labs(title = "Corrélation entre l'année et la consommation de carburant en ville", x = "Année", y = "Consommation moyenne (L/100 km)") +
+  theme_minimal()
+
+# Hwy Fuel Consumption vs Year
+ggplot(moyennes_annuelles, aes(x = Year, y = Moyenne_Hwy)) +
+  geom_line() +
+  geom_smooth(method = "lm", se = FALSE, color = "green") +
+  labs(title = "Corrélation entre l'année et la consommation de carburant sur autoroute", x = "Année", y = "Consommation moyenne (L/100 km)") +
+  theme_minimal()
+
+# Comb Fuel Consumption vs Year
+ggplot(moyennes_annuelles, aes(x = Year, y = Moyenne_Comb)) +
+  geom_line() +
+  geom_smooth(method = "lm", se = FALSE, color = "purple") +
+  labs(title = "Corrélation entre l'année et la consommation de carburant combinée", x = "Année", y = "Consommation moyenne (L/100 km)") +
+  theme_minimal()
+
+# CO2 Emissions vs Year
+ggplot(moyennes_annuelles, aes(x = Year, y = Moyenne_CO2)) +
+  geom_line() +
+  geom_smooth(method = "lm", se = FALSE, color = "red") +
+  labs(title = "Corrélation entre l'année et les émissions de CO2", x = "Année", y = "Émissions moyennes de CO2 (g/km)") +
+  theme_minimal()
+
+#7. Nuages de points pour la corrélation de Pearson (4 graphiques : City, Hwy, Comb, CO2)
+# City Fuel Consumption vs Year
+ggplot(moyennes_annuelles, aes(x = Year, y = Moyenne_City)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") +
+  labs(title = "Nuage de points - Corrélation entre l'année et la consommation de carburant en ville", x = "Année", y = "Consommation moyenne (L/100 km)") +
+  theme_minimal()
+
+# Hwy Fuel Consumption vs Year
+ggplot(moyennes_annuelles, aes(x = Year, y = Moyenne_Hwy)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "green") +
+  labs(title = "Nuage de points - Corrélation entre l'année et la consommation de carburant sur autoroute", x = "Année", y = "Consommation moyenne (L/100 km)") +
+  theme_minimal()
+
+# Comb Fuel Consumption vs Year
+ggplot(moyennes_annuelles, aes(x = Year, y = Moyenne_Comb)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "purple") +
+  labs(title = "Nuage de points - Corrélation entre l'année et la consommation de carburant combinée", x = "Année", y = "Consommation moyenne (L/100 km)") +
+  theme_minimal()
+
+# CO2 Emissions vs Year
+ggplot(moyennes_annuelles, aes(x = Year, y = Moyenne_CO2)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "red") +
+  labs(title = "Nuage de points - Corrélation entre l'année et les émissions de CO2", x = "Année", y = "Émissions moyennes de CO2 (g/km)") +
+  theme_minimal()
+
+#8. Boîtes à moustaches pour la corrélation de Pearson (4 graphiques : City, Hwy, Comb, CO2)
+# City Fuel Consumption vs Year
+ggplot(combined_data, aes(x = factor(Year), y = `Fuel Consumption (City) (L/100 km)`)) +
+  geom_boxplot() +
+  labs(title = "Boîte à moustaches - Corrélation entre l'année et la consommation de carburant en ville", x = "Année", y = "Consommation (L/100 km)") +
+  theme_minimal()
+
+# Hwy Fuel Consumption vs Year
+ggplot(combined_data, aes(x = factor(Year), y = `Fuel Consumption (Hwy) (L/100 km)`)) +
+  geom_boxplot() +
+  labs(title = "Boîte à moustaches - Corrélation entre l'année et la consommation de carburant sur autoroute", x = "Année", y = "Consommation (L/100 km)") +
+  theme_minimal()
+
+# Comb Fuel Consumption vs Year
+ggplot(combined_data, aes(x = factor(Year), y = `Fuel Consumption (Comb) (L/100 km)`)) +
+  geom_boxplot() +
+  labs(title = "Boîte à moustaches - Corrélation entre l'année et la consommation de carburant combinée", x = "Année", y = "Consommation (L/100 km)") +
+  theme_minimal()
+
+# CO2 Emissions vs Year
+ggplot(combined_data, aes(x = factor(Year), y = `CO2 Emissions (g/km)`)) +
+  geom_boxplot() +
+  labs(title = "Boîte à moustaches - Corrélation entre l'année et les émissions de CO2", x = "Année", y = "Émissions de CO2 (g/km)") +
+  theme_minimal()
+
+#9. Histogrammes sous forme de barres pour la corrélation de Pearson (4 graphiques : City, Hwy, Comb, CO2)
+# City Fuel Consumption vs Year
+ggplot(combined_data, aes(x = `Fuel Consumption (City) (L/100 km)`)) +
+  geom_histogram(binwidth = 0.5, fill = "blue", color = "black") +
+  labs(title = "Histogramme - Corrélation entre l'année et la consommation de carburant en ville", x = "Consommation (L/100 km)", y = "Fréquence") +
+  theme_minimal()
+
+# Hwy Fuel Consumption vs Year
+ggplot(combined_data, aes(x = `Fuel Consumption (Hwy) (L/100 km)`)) +
+  geom_histogram(binwidth = 0.5, fill = "green", color = "black") +
+  labs(title = "Histogramme - Corrélation entre l'année et la consommation de carburant sur autoroute", x = "Consommation (L/100 km)", y = "Fréquence") +
+  theme_minimal()
+
+# Comb Fuel Consumption vs Year
+ggplot(combined_data, aes(x = `Fuel Consumption (Comb) (L/100 km)`)) +
+  geom_histogram(binwidth = 0.5, fill = "purple", color = "black") +
+  labs(title = "Histogramme - Corrélation entre l'année et la consommation de carburant combinée", x = "Consommation (L/100 km)", y = "Fréquence") +
+  theme_minimal()
+
+# CO2 Emissions vs Year
+ggplot(combined_data, aes(x = `CO2 Emissions (g/km)`)) +
+  geom_histogram(binwidth = 10, fill = "red", color = "black") +
+  labs(title = "Histogramme - Corrélation entre l'année et les émissions de CO2", x = "Émissions de CO2 (g/km)", y = "Fréquence") +
+  theme_minimal()
+
+#10. Barres groupées pour la corrélation de Pearson (4 graphiques : City, Hwy, Comb, CO2)
+# City Fuel Consumption vs Year
+ggplot(combined_data, aes(x = factor(Year), y = `Fuel Consumption (City) (L/100 km)`, fill = `Fuel Type`)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Barres groupées - Corrélation entre l'année et la consommation de carburant en ville", x = "Année", y = "Consommation (L/100 km)") +
+  theme_minimal()
+
+# Hwy Fuel Consumption vs Year
+ggplot(combined_data, aes(x = factor(Year), y = `Fuel Consumption (Hwy) (L/100 km)`, fill = `Fuel Type`)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Barres groupées - Corrélation entre l'année et la consommation de carburant sur autoroute", x = "Année", y = "Consommation (L/100 km)") +
+  theme_minimal()
+
+# Comb Fuel Consumption vs Year
+ggplot(combined_data, aes(x = factor(Year), y = `Fuel Consumption (Comb) (L/100 km)`, fill = `Fuel Type`)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Barres groupées - Corrélation entre l'année et la consommation de carburant combinée", x = "Année", y = "Consommation (L/100 km)") +
+  theme_minimal()
+
+# CO2 Emissions vs Year
+ggplot(combined_data, aes(x = factor(Year), y = `CO2 Emissions (g/km)`, fill = `Fuel Type`)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Barres groupées - Corrélation entre l'année et les émissions de CO2", x = "Année", y = "Émissions de CO2 (g/km)") +
+  theme_minimal()
