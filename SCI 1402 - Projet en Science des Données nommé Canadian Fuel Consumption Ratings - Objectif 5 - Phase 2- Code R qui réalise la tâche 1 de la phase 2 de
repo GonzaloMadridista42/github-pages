@@ -1,0 +1,99 @@
+# Installation et chargement des bibliothèques nécessaires
+install.packages("dunn.test")
+install.packages("ggplot2")
+install.packages("dplyr")
+install.packages("readr")
+install.packages("writexl")
+install.packages("forecast")
+install.packages("Kendall")
+
+library(dunn.test)
+library(ggplot2)
+library(dplyr)
+library(readr)
+library(writexl)
+library(forecast)
+library(Kendall)
+
+# Spécifier le chemin où se trouvent vos fichiers CSV
+chemin_donnees <- "C:/Users/lalop/OneDrive/Documentos/SCI 1402/"
+
+# Liste des fichiers CSV des échantillons
+fichiers_echantillons <- c('Sample_1_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2017_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2017_Fuel_Consumption_Ratings.csv',
+                           'Sample_1_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2023_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2023_Fuel_Consumption_Ratings.csv')
+
+# Créer un dataframe vide pour combiner toutes les données
+combined_data <- data.frame()
+
+# Boucle pour lire chaque échantillon et combiner les données
+for (fichier in fichiers_echantillons) {
+  data <- read_csv(paste0(chemin_donnees, fichier))
+  combined_data <- rbind(combined_data, data)
+}
+
+# Agréger les données par année et par type de carburant
+data_aggregated <- combined_data %>%
+  group_by(Year, `Fuel Type`) %>%
+  summarize(CO2_Mean = mean(`CO2 Rating`, na.rm = TRUE), 
+            Smog_Mean = mean(`Smog Rating`, na.rm = TRUE))
+
+# Appliquer le test de Mann-Kendall pour chaque type de carburant
+for (fuel_type in unique(data_aggregated$`Fuel Type`)) {
+    # Filtrer les données pour chaque type de carburant
+    data_fuel <- data_aggregated %>% filter(`Fuel Type` == fuel_type)
+    
+    # Appliquer le test de Mann-Kendall sur les cotes de CO2 et de Smog
+    co2_ts <- ts(data_fuel$CO2_Mean, start = min(data_fuel$Year), frequency = 1)
+    smog_ts <- ts(data_fuel$Smog_Mean, start = min(data_fuel$Year), frequency = 1)
+    
+    # Appliquer le test de Mann-Kendall
+    co2_mk_test <- MannKendall(co2_ts)
+    smog_mk_test <- MannKendall(smog_ts)
+    
+    # Exporter les résultats des tests dans un fichier texte
+    writeLines(capture.output(co2_mk_test, smog_mk_test), paste0(chemin_donnees, "Mann_Kendall_Results_", fuel_type, ".txt"))
+    
+    # Afficher les résultats des tests
+    print(paste("Test de Mann-Kendall pour CO2 Rating - Type de Carburant :", fuel_type))
+    print(co2_mk_test)
+    
+    print(paste("Test de Mann-Kendall pour Smog Rating - Type de Carburant :", fuel_type))
+    print(smog_mk_test)
+}
+
+# Appliquer le lissage exponentiel pour chaque type de carburant
+for (fuel_type in unique(data_aggregated$`Fuel Type`)) {
+    # Filtrer les données par type de carburant
+    data_fuel <- data_aggregated %>% filter(`Fuel Type` == fuel_type)
+    
+    co2_ts <- ts(data_fuel$CO2_Mean, start = min(data_fuel$Year), frequency = 1)
+    smog_ts <- ts(data_fuel$Smog_Mean, start = min(data_fuel$Year), frequency = 1)
+    
+    # Lissage exponentiel simple
+    co2_smooth <- HoltWinters(co2_ts)
+    smog_smooth <- HoltWinters(smog_ts)
+    
+    # Exporter les résultats des lissages exponentiels dans un fichier texte
+    writeLines(capture.output(co2_smooth), paste0(chemin_donnees, "Exponential_Smoothing_CO2_", fuel_type, ".txt"))
+    writeLines(capture.output(smog_smooth), paste0(chemin_donnees, "Exponential_Smoothing_Smog_", fuel_type, ".txt"))
+    
+    # Visualiser les tendances lissées pour CO2 et Smog
+    plot(co2_smooth, main = paste("Tendance lissée des cotes de CO2 (2015-2023) pour le type de carburant", fuel_type))
+    plot(smog_smooth, main = paste("Tendance lissée des cotes de Smog (2015-2023) pour le type de carburant", fuel_type))
+}
