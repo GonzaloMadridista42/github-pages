@@ -1,0 +1,136 @@
+# Installation et chargement des bibliothèques nécessaires
+install.packages("dplyr")
+install.packages("ggplot2")
+install.packages("readr")
+
+library(dplyr)
+library(ggplot2)
+library(readr)
+
+# Spécifier le chemin où se trouvent vos fichiers CSV
+chemin_donnees <- "C:/Users/lalop/OneDrive/Documentos/SCI 1402/"
+
+# Liste des fichiers CSV des échantillons
+fichiers_echantillons <- c('Sample_1_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2017_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2017_Fuel_Consumption_Ratings.csv',
+                           'Sample_1_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2023_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2023_Fuel_Consumption_Ratings.csv')
+
+# Créer un dataframe vide pour combiner toutes les données
+combined_data <- data.frame()
+
+# Boucle pour lire chaque échantillon et combiner les données
+for (fichier in fichiers_echantillons) {
+  data <- read_csv(paste0(chemin_donnees, fichier))
+  combined_data <- rbind(combined_data, data)
+}
+
+# Calcul des statistiques descriptives pour chaque classe de véhicule
+stats_summary <- combined_data %>%
+  group_by(`Vehicle Class`, Year) %>%
+  summarise(
+    Moyenne_City = mean(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE),
+    Mediane_City = median(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE),
+    Ecart_Type_City = sd(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE),
+    Mode_City = as.numeric(names(sort(table(`Fuel Consumption (City) (L/100 km)`), decreasing = TRUE)[1])),
+    Etendue_City = diff(range(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE)),
+    CV_City = sd(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE) / mean(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE) * 100,
+    
+    Moyenne_Hwy = mean(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE),
+    Mediane_Hwy = median(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE),
+    Ecart_Type_Hwy = sd(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE),
+    Mode_Hwy = as.numeric(names(sort(table(`Fuel Consumption (Hwy) (L/100 km)`), decreasing = TRUE)[1])),
+    Etendue_Hwy = diff(range(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE)),
+    CV_Hwy = sd(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE) / mean(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE) * 100,
+    
+    Moyenne_Comb = mean(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE),
+    Mediane_Comb = median(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE),
+    Ecart_Type_Comb = sd(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE),
+    Mode_Comb = as.numeric(names(sort(table(`Fuel Consumption (Comb) (L/100 km)`), decreasing = TRUE)[1])),
+    Etendue_Comb = diff(range(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE)),
+    CV_Comb = sd(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE) / mean(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE) * 100,
+    
+    Moyenne_CO2 = mean(`CO2 Emissions (g/km)`, na.rm = TRUE),
+    Mediane_CO2 = median(`CO2 Emissions (g/km)`, na.rm = TRUE),
+    Ecart_Type_CO2 = sd(`CO2 Emissions (g/km)`, na.rm = TRUE),
+    Mode_CO2 = as.numeric(names(sort(table(`CO2 Emissions (g/km)`), decreasing = TRUE)[1])),
+    Etendue_CO2 = diff(range(`CO2 Emissions (g/km)`, na.rm = TRUE)),
+    CV_CO2 = sd(`CO2 Emissions (g/km)`, na.rm = TRUE) / mean(`CO2 Emissions (g/km)`, na.rm = TRUE) * 100
+  )
+
+# Exporter les statistiques descriptives vers des fichiers CSV et TXT
+write.csv(stats_summary, file = paste0(chemin_donnees, "Descriptive_Statistics_Vehicle_Class_Samples_1_And_2_Completed_MY2015_2023_Fuel_Consumption_Ratings.csv"))
+write.table(stats_summary, file = paste0(chemin_donnees, "Descriptive_Statistics_Vehicle_Class_Samples_1_And_2_Completed_MY2015_2023_Fuel_Consumption_Ratings.txt"), sep = "\t")
+
+# Fonction pour générer et afficher tous les graphiques pour une variable de performance donnée
+generate_graphics <- function(data, y_var, y_label, title_base) {
+  
+  # 1. Graphiques en lignes simples
+  plot_lignes_simples <- ggplot(data, aes(x = Year, y = !!sym(y_var), color = `Vehicle Class`, group = `Vehicle Class`)) +
+    geom_line() +
+    geom_point() +
+    labs(title = paste0("Évolution ", title_base, " (Lignes simples)"),
+         x = "Année", y = y_label) +
+    theme_minimal()
+  print(plot_lignes_simples)
+  
+  # 2. Histogrammes sous forme de barres
+  plot_barres <- ggplot(data, aes(x = Year, y = !!sym(y_var), fill = `Vehicle Class`)) +
+    geom_bar(stat = "identity", position = "dodge") +
+    labs(title = paste0("Évolution ", title_base, " (Histogramme sous forme de Barres)"),
+         x = "Année", y = y_label) +
+    theme_minimal()
+  print(plot_barres)
+  
+  # 3. Graphiques en aires empilées
+  plot_aires <- ggplot(data, aes(x = Year, y = !!sym(y_var), fill = `Vehicle Class`)) +
+    geom_area(position = "stack") +
+    labs(title = paste0("Évolution ", title_base, " (Aires empilées)"),
+         x = "Année", y = y_label) +
+    theme_minimal()
+  print(plot_aires)
+  
+  # 4. Boxplots
+  plot_boxplots <- ggplot(data, aes(x = factor(Year), y = !!sym(y_var), fill = `Vehicle Class`)) +
+    geom_boxplot() +
+    labs(title = paste0("Évolution ", title_base, " (Boxplots)"),
+         x = "Année", y = y_label) +
+    theme_minimal()
+  print(plot_boxplots)
+  
+  # 5. Nuages de points
+  plot_nuage_points <- ggplot(data, aes(x = Year, y = !!sym(y_var), color = `Vehicle Class`)) +
+    geom_point(size = 2) +
+    labs(title = paste0("Évolution ", title_base, " (Nuage de points)"),
+         x = "Année", y = y_label) +
+    theme_minimal()
+  print(plot_nuage_points)
+  
+  # 6. Barres groupées
+  plot_barres_groupées <- ggplot(data, aes(x = factor(Year), y = !!sym(y_var), fill = `Vehicle Class`)) +
+    geom_bar(stat = "identity", position = "dodge") +
+    labs(title = paste0("Évolution ", title_base, " (Barres groupées)"),
+         x = "Année", y = y_label) +
+    theme_minimal()
+  print(plot_barres_groupées)
+}
+
+# Utilisation de la fonction avec toutes les données combinées
+generate_graphics(combined_data, "Fuel Consumption (City) (L/100 km)", "Consommation en ville (L/100 km)", "consommation_ville")
+generate_graphics(combined_data, "Fuel Consumption (Hwy) (L/100 km)", "Consommation sur autoroute (L/100 km)", "consommation_autoroute")
+generate_graphics(combined_data, "Fuel Consumption (Comb) (L/100 km)", "Consommation combinée (L/100 km)", "consommation_combinée")
+generate_graphics(combined_data, "CO2 Emissions (g/km)", "Émissions de CO2 (g/km)", "emissions_co2")
