@@ -1,0 +1,74 @@
+# Installation et chargement des bibliothèques nécessaires
+install.packages("dplyr")
+install.packages("ggplot2")
+install.packages("readr")
+
+library(dplyr)
+library(ggplot2)
+library(readr)
+
+# Option pour afficher toutes les colonnes dans la console
+options(tibble.width = Inf)  # Affiche toutes les colonnes sans limite
+
+# Spécifier le chemin où se trouvent vos fichiers CSV
+chemin_donnees <- "C:/Users/lalop/OneDrive/Documentos/SCI 1402/"
+
+# Liste des fichiers CSV des échantillons
+fichiers_echantillons <- c('Sample_1_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2017_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2017_Fuel_Consumption_Ratings.csv',
+                           'Sample_1_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2023_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2023_Fuel_Consumption_Ratings.csv')
+
+# Boucle pour effectuer des régressions linéaires par année, par échantillon et par variable
+for (annee in 2015:2023) {
+  for (echantillon in c("Sample_1", "Sample_2")) {
+    # Filtrer les fichiers pour l'année et l'échantillon donnés
+    fichiers_a_traiter <- fichiers_echantillons[grepl(annee, fichiers_echantillons) & grepl(echantillon, fichiers_echantillons)]
+    
+    # Lire et combiner les données pour cette année et cet échantillon
+    combined_data <- data.frame()
+    for (fichier in fichiers_a_traiter) {
+      data <- read_csv(paste0(chemin_donnees, fichier))
+      combined_data <- rbind(combined_data, data)
+    }
+    
+    # Régressions linéaires pour chaque type de consommation et émissions de CO2
+    variables <- list(
+      "Fuel_Consumption_City" = "Fuel Consumption (City) (L/100 km)",
+      "Fuel_Consumption_Hwy" = "Fuel Consumption (Hwy) (L/100 km)",
+      "Fuel_Consumption_Comb" = "Fuel Consumption (Comb) (L/100 km)",
+      "CO2_Emissions" = "CO2 Emissions (g/km)"
+    )
+    
+    for (var_name in names(variables)) {
+      var_col <- variables[[var_name]]
+      
+      # Effectuer la régression linéaire
+      regression <- lm(as.formula(paste0("`", var_col, "` ~ Year + Make + Model")), data = combined_data)
+      
+      # Exporter les résultats vers un fichier CSV et TXT
+      csv_file <- paste0(chemin_donnees, "Regression_", echantillon, "_", annee, "_", var_name, ".csv")
+      txt_file <- paste0(chemin_donnees, "Regression_", echantillon, "_", annee, "_", var_name, ".txt")
+      
+      write.csv(summary(regression)$coefficients, file = csv_file)
+      writeLines(capture.output(summary(regression)), txt_file)
+    }
+  }
+}
+
+# Message de réussite
+print("Régressions linéaires par année et par échantillon réalisées avec succès.")
