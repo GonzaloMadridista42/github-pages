@@ -1,0 +1,265 @@
+Year,Make,Model,Vehicle Class,Engine Size (L),Cylinders,Transmission,Fuel Type,Fuel Consumption (City) (L/100 km),Fuel Consumption (Hwy) (L/100 km),Fuel Consumption (Comb) (L/100 km),Fuel Consumption (Comb) (mpg),CO2 Emissions (g/km),CO2 Rating,Smog Rating
+2019,BMW,750Li xDrive,Full-size,4.4,8,AS8,Z,14.0,9.6,12.0,24.0,282.0,4.0,3.0
+2019,Land Rover,Range Rover Sport 3.0,SUV: Standard,3,6,AS8,Z,14.1,10.3,12.4,23.0,291.0,3.0,7.0
+2019,Chevrolet,Suburban FFV,SUV: Standard,5.3,8,A6,X,15.7,10.5,13.4,21.0,314.0,3.0,3.0
+2019,Nissan,Titan 4WD Pro-4X,Pickup truck: Standard,5.6,8,AS7,X,15.9,11.9,14.1,20.0,331.0,3.0,3.0
+2019,BMW,M5,Mid-size,4.4,8,AS8,Z,16.0,11.2,13.9,20.0,324.0,3.0,3.0
+2019,Audi,TT Roadster quattro,Two-seater,2,4,AM7,X,10.3,7.7,9.2,31.0,213.0,5.0,7.0
+2019,Ram,1500 Classic EcoDiesel,Pickup truck: Standard,3,6,A8,D,11.8,8.6,10.4,27.0,278.0,4.0,1.0
+2019,BMW,540i xDrive,Mid-size,3,6,AS8,Z,11.2,8.1,9.8,29.0,231.0,5.0,5.0
+2019,Maserati,GranTurismo Convertible,Subcompact,4.7,8,AS6,Z,17.8,11.6,15.0,19.0,354.0,2.0,1.0
+2019,Lamborghini,Huracan Coupe,Two-seater,5.2,10,AM7,Z,18.1,13.2,15.9,18.0,366.0,2.0,1.0
+2019,BMW,Z4 sDrive30i,Two-seater,2,4,AS8,Z,9.4,7.4,8.5,33.0,199.0,6.0,7.0
+2019,Hyundai,Santa Fe XL,SUV: Small,3.3,6,AS6,X,13.2,9.4,11.5,25.0,268.0,4.0,3.0
+2019,Jaguar,F-TYPE R AWD Coupe,Two-seater,5,8,AS8,Z,15.6,10.4,13.3,21.0,311.0,3.0,3.0
+2019,Bentley,Bentayga,SUV: Standard,4,8,AS8,Z,16.4,10.1,13.6,21.0,315.0,3.0,3.0
+2019,Rolls-Royce,Ghost EWB,Full-size,6.6,12,AS8,Z,20.3,13.0,17.0,17.0,397.0,1.0,3.0
+2019,Audi,A4 quattro,Compact,2,4,AM7,Z,10.0,7.0,8.7,32.0,204.0,6.0,5.0
+2019,Chevrolet,Blazer AWD,SUV: Small,3.6,6,A9,X,12.7,9.5,11.3,25.0,265.0,4.0,6.0
+2019,Chevrolet,Silverado 4WD,Pickup truck: Standard,5.3,8,A6,X,15.9,11.7,14.0,20.0,329.0,3.0,5.0
+2019,Ford,F-150 FFV,Pickup truck: Standard,3.3,6,AS6,E,16.7,12.6,14.9,19.0,247.0,4.0,5.0
+2019,Rolls-Royce,Cullinan,Station wagon: Mid-size,6.7,12,AS8,Z,20.0,11.8,16.3,17.0,382.0,1.0,3.0
+2019,Land Rover,Range Rover Sport Td6 Diesel,SUV: Standard,3,6,AS8,D,10.7,8.3,9.6,29.0,256.0,4.0,1.0
+2019,Chrysler,300 FFV,Full-size,3.6,6,A8,E,17.1,10.6,14.2,20.0,234.0,5.0,3.0
+2019,Kia,Sportage AWD,SUV: Small,2,4,AS6,X,11.9,10.2,11.1,25.0,263.0,4.0,3.0
+2019,GMC,Sierra FFV,Pickup truck: Standard,5.3,8,A6,E,21.1,15.0,18.4,15.0,306.0,3.0,3.0
+2019,BMW,M2 Competition,Subcompact,3,6,M6,Z,13.4,9.6,11.7,24.0,273.0,4.0,3.0
+2019,Jaguar,XJ R-Sport AWD,Full-size,3,6,AS8,Z,14.0,9.0,11.8,24.0,276.0,4.0,7.0
+2019,Ram,1500 eTorque,Pickup truck: Standard,5.7,8,A8,X,14.1,10.3,12.4,23.0,290.0,3.0,5.0
+2019,Ford,Shelby GT350 Mustang,Subcompact,5.2,8,M6,Z,17.2,11.3,14.6,19.0,341.0,2.0,3.0
+2019,Honda,Pilot,SUV: Small,3.5,6,A6,X,12.4,8.7,10.7,26.0,250.0,4.0,3.0
+2019,Volvo,XC60 T6 AWD,SUV: Small,2,4,AS8,Z,11.8,8.6,10.4,27.0,242.0,5.0,7.0
+2019,Mazda,MX-5 (SIL),Two-seater,2,4,M6,Z,9.0,7.0,8.1,35.0,189.0,6.0,3.0
+2019,Ford,F-150 FFV 4X4 (LT Tire Pkg),Pickup truck: Standard,3.3,6,AS6,E,17.5,13.7,15.8,18.0,263.0,4.0,5.0
+2019,Jaguar,F-TYPE Convertible R-Dynamic AWD,Two-seater,3,6,AS8,Z,13.0,9.2,11.3,25.0,265.0,4.0,7.0
+2019,BMW,M240i xDrive Coupe M Performance,Subcompact,3,6,AS8,Z,11.3,8.0,9.8,29.0,229.0,5.0,3.0
+2019,Jeep,Compass 4X4,SUV: Small,2.4,4,M6,X,10.8,7.6,9.4,30.0,221.0,5.0,3.0
+2019,Mitsubishi,RVR 4WD,SUV: Small,2.4,4,AV6,X,10.3,8.3,9.4,30.0,218.0,5.0,5.0
+2019,Land Rover,Discovery,SUV: Standard,3,6,AS8,Z,14.8,11.4,13.3,21.0,311.0,3.0,7.0
+2019,Volkswagen,Golf SportWagen,Station wagon: Small,1.4,4,M6,X,8.2,6.3,7.4,38.0,172.0,7.0,7.0
+2019,Toyota,Tacoma 4WD,Pickup truck: Small,2.7,4,AS6,X,12.7,10.6,11.7,24.0,274.0,4.0,5.0
+2019,Jeep,Wrangler JL 4X4,SUV: Small,3.6,6,A8,X,12.8,10.4,11.8,24.0,274.0,4.0,5.0
+2019,Ram,1500 Classic FFV,Pickup truck: Standard,3.6,6,A8,E,19.7,13.8,17.0,17.0,283.0,4.0,3.0
+2019,Buick,Regal AWD,Mid-size,2,4,AS8,Z,11.0,8.0,9.6,29.0,227.0,5.0,5.0
+2019,GMC,Canyon 4WD,Pickup truck: Small,3.6,6,A8,X,14.0,9.9,12.2,23.0,286.0,3.0,5.0
+2019,Volkswagen,Golf GTI,Compact,2,4,M6,X,9.8,7.3,8.7,32.0,203.0,6.0,7.0
+2019,Dodge,Challenger,Mid-size,6.4,8,M6,Z,16.7,10.4,13.9,20.0,325.0,3.0,1.0
+2019,Mercedes-Benz,AMG GLC 63 S 4MATIC+ Coupe,SUV: Small,4,8,A9,Z,15.0,10.9,13.2,21.0,309.0,3.0,5.0
+2019,Volvo,S60 T5,Compact,2,4,AS8,Z,9.9,6.6,8.4,34.0,197.0,6.0,5.0
+2019,Ford,T-150 Wagon,Van: Passenger,3.7,6,AS6,X,16.9,13.1,15.2,19.0,355.0,2.0,1.0
+2019,Land Rover,Range Rover SVAutobiography LWB,SUV: Standard,5,8,AS8,Z,17.9,12.7,15.5,18.0,365.0,2.0,3.0
+2019,Buick,Enclave,SUV: Standard,3.6,6,A9,X,13.0,9.1,11.2,25.0,263.0,4.0,6.0
+2019,Chrysler,300 FFV,Full-size,3.6,6,A8,X,12.4,7.8,10.3,27.0,242.0,5.0,3.0
+2019,Rolls-Royce,Wraith,Mid-size,6.6,12,AS8,Z,19.6,12.9,16.6,17.0,388.0,1.0,3.0
+2019,Nissan,Sentra (Turbo),Mid-size,1.6,4,AV7,Z,8.9,7.3,8.2,34.0,193.0,6.0,3.0
+2019,Toyota,Corolla Hatchback,Compact,2,4,M6,X,8.4,6.3,7.5,38.0,174.0,7.0,6.0
+2019,BMW,Alpina B7 xDrive,Full-size,4.4,8,AS8,Z,14.0,9.6,12.0,24.0,282.0,4.0,3.0
+2019,GMC,Acadia,SUV: Standard,2.5,4,A6,X,11.1,9.2,10.2,28.0,237.0,5.0,5.0
+2019,Mercedes-Benz,AMG C 43 4MATIC Wagon,Station wagon: Small,3,6,A9,Z,12.4,8.9,10.8,26.0,255.0,4.0,5.0
+2019,Nissan,Qashqai,Station wagon: Small,2,4,M6,X,10.1,8.1,9.2,31.0,217.0,5.0,5.0
+2019,BMW,330i xDrive Gran Turismo,Full-size,2,4,AS8,Z,10.2,7.2,8.8,32.0,207.0,6.0,7.0
+2019,Jeep,Renegade 4X4 Trailhawk,SUV: Small,1.3,4,A9,X,10.8,8.7,9.9,29.0,230.0,5.0,6.0
+2019,Mercedes-Benz,Maybach S 560 4MATIC,Full-size,4,8,A9,Z,14.4,9.5,12.2,23.0,286.0,3.0,5.0
+2019,Chevrolet,Tahoe 4WD,SUV: Standard,6.2,8,A10,Z,16.4,10.7,13.8,20.0,325.0,3.0,3.0
+2019,BMW,M4 Cabriolet,Subcompact,3,6,AM7,Z,14.5,10.5,12.7,22.0,299.0,3.0,3.0
+2019,Hyundai,Elantra,Mid-size,2,4,M6,X,9.2,6.5,8.0,35.0,188.0,6.0,5.0
+2019,Cadillac,XT4,SUV: Small,2,4,AS9,Z,9.8,7.8,8.9,32.0,209.0,5.0,6.0
+2019,Mercedes-Benz,AMG C 63 S Cabriolet,Subcompact,4,8,A9,Z,13.9,9.7,12.0,24.0,282.0,4.0,5.0
+2019,Porsche,911 Turbo Cabriolet,Minicompact,3.8,6,AM7,Z,12.7,9.9,11.4,25.0,267.0,4.0,1.0
+2019,Nissan,Sentra,Mid-size,1.8,4,AV,X,8.1,6.3,7.3,39.0,172.0,7.0,7.0
+2019,Subaru,WRX AWD,Compact,2,4,AV8,Z,12.6,9.6,11.2,25.0,256.0,4.0,1.0
+2019,Ram,1500 Classic FFV,Pickup truck: Standard,3.6,6,A8,X,13.9,9.6,11.9,24.0,280.0,4.0,3.0
+2019,Ford,Explorer AWD,SUV: Standard,2.3,4,AS6,X,13.1,9.2,11.4,25.0,267.0,4.0,3.0
+2019,Audi,SQ5,SUV: Small,3,6,AS8,Z,12.7,10.0,11.5,25.0,270.0,4.0,5.0
+2019,Mercedes-Benz,AMG C 63,Compact,4,8,A9,Z,13.2,8.7,11.2,25.0,263.0,4.0,5.0
+2019,Chevrolet,Cruze Diesel,Compact,1.6,4,A9,D,7.6,4.9,6.4,44.0,172.0,7.0,3.0
+2019,BMW,M240i Coupe,Subcompact,3,6,M6,Z,12.8,8.8,11.0,26.0,256.0,4.0,3.0
+2019,Ford,Transit Connect Van,Special purpose vehicle,2.5,4,AS6,X,12.0,8.8,10.6,27.0,247.0,4.0,5.0
+2019,Porsche,911 Carrera 4S,Minicompact,3,6,AM7,Z,11.1,8.5,9.9,29.0,232.0,5.0,1.0
+2019,Lincoln,Continental AWD,Full-size,2.7,6,AS6,X,14.0,9.4,12.0,24.0,281.0,4.0,5.0
+2019,Maserati,Quattroporte SQ4,Full-size,3,6,AS8,Z,15.0,10.3,12.8,22.0,301.0,3.0,1.0
+2019,Jaguar,F-TYPE Convertible,Two-seater,3,6,M6,Z,14.9,9.8,12.6,22.0,296.0,3.0,7.0
+2019,Chevrolet,Suburban 4WD FFV,SUV: Standard,5.3,8,A6,E,22.2,15.2,19.0,15.0,317.0,3.0,3.0
+2019,BMW,X3 M40i,SUV: Small,3,6,AS8,Z,11.9,8.7,10.4,27.0,245.0,5.0,5.0
+2019,Mercedes-Benz,AMG CLA 45 4MATIC,Minicompact,2,4,AM7,Z,10.3,7.9,9.2,31.0,217.0,5.0,3.0
+2019,Buick,LaCrosse AWD,Mid-size,3.6,6,AS9,X,11.7,8.2,10.1,28.0,238.0,5.0,5.0
+2019,Chevrolet,Camaro,Subcompact,3.6,6,M6,X,14.3,8.8,11.8,24.0,277.0,4.0,5.0
+2019,GMC,Canyon,Pickup truck: Small,2.5,4,A6,X,12.1,9.2,10.8,26.0,253.0,4.0,5.0
+2019,Mercedes-Benz,AMG C 43 4MATIC,Compact,3,6,A9,Z,12.4,8.7,10.7,26.0,253.0,4.0,5.0
+2019,GMC,Yukon XL 4WD,SUV: Standard,5.3,8,A6,X,16.8,11.3,14.3,20.0,336.0,2.0,3.0
+2019,Volvo,S60 T6 AWD,Compact,2,4,AS8,Z,11.1,7.3,9.4,30.0,218.0,5.0,7.0
+2019,Audi,A7 quattro,Mid-size,3,6,AM7,Z,10.7,8.2,9.6,29.0,224.0,5.0,5.0
+2019,Jeep,Grand Cherokee 4X4,SUV: Standard,5.7,8,A8,X,16.7,10.9,14.1,20.0,331.0,3.0,3.0
+2019,Honda,Odyssey Touring,Minivan,3.5,6,AS10,X,12.2,8.5,10.6,27.0,247.0,4.0,3.0
+2019,Honda,Civic Hatchback Sport,Full-size,1.5,4,AV7,Z,7.9,6.6,7.3,39.0,170.0,7.0,3.0
+2019,GMC,Sierra,Pickup truck: Standard,5.3,8,A6,X,15.9,11.4,13.9,20.0,326.0,3.0,5.0
+2019,Mercedes-Benz,AMG C 63 S Coupe,Subcompact,4,8,A9,Z,13.9,9.2,11.8,24.0,277.0,4.0,5.0
+2019,Dodge,Charger AWD,Full-size,3.6,6,A8,X,12.8,8.7,11.0,26.0,258.0,4.0,3.0
+2019,Rolls-Royce,Phantom EWB,Full-size,6.7,12,AS8,Z,20.0,11.8,16.3,17.0,382.0,1.0,3.0
+2019,Porsche,911 Carrera 4 GTS Cabriolet,Minicompact,3,6,M7,Z,12.9,9.1,11.2,25.0,260.0,4.0,1.0
+2019,Porsche,911 Carrera 4,Minicompact,3,6,M7,Z,12.1,8.3,10.4,27.0,242.0,5.0,1.0
+2019,Volvo,XC90 T5 AWD,SUV: Standard,2,4,AS8,Z,11.3,8.5,10.0,28.0,233.0,5.0,5.0
+2019,Ford,Escape,SUV: Small,1.5,4,AS6,X,10.2,7.8,9.1,31.0,214.0,5.0,7.0
+2019,Lamborghini,Aventador Roadster,Two-seater,6.5,12,AM7,Z,26.6,15.8,21.7,13.0,493.0,1.0,1.0
+2019,Honda,Fit,Station wagon: Small,1.5,4,AV,X,7.0,5.9,6.5,43.0,151.0,8.0,7.0
+2019,GMC,Sierra,Pickup truck: Standard,2.7,4,A8,X,11.9,10.3,11.1,25.0,261.0,4.0,6.0
+2019,Nissan,Altima,Mid-size,2.5,4,AV,X,8.6,6.1,7.4,38.0,174.0,7.0,7.0
+2019,Jaguar,XE 25t AWD,Compact,2,4,AS8,Z,9.8,6.9,8.5,33.0,200.0,6.0,7.0
+2019,Mazda,CX-3,Compact,2,4,AS6,X,8.3,6.9,7.7,37.0,179.0,7.0,3.0
+2019,Audi,Q5,SUV: Small,2,4,AM7,Z,10.9,8.7,9.9,29.0,230.0,5.0,3.0
+2019,Chevrolet,Silverado 4WD FFV,Pickup truck: Standard,5.3,8,A6,E,22.0,16.1,19.3,15.0,322.0,3.0,3.0
+2019,Volkswagen,Jetta GLI,Compact,2,4,AM7,X,9.3,7.2,8.4,34.0,196.0,6.0,7.0
+2019,Maserati,Quattroporte GTS,Full-size,3.8,8,AS8,Z,16.0,10.8,13.7,21.0,321.0,3.0,1.0
+2019,Mercedes-Benz,E 450 4MATIC Cabriolet,Subcompact,3,6,A9,Z,12.7,10.1,11.6,24.0,271.0,4.0,5.0
+2019,Dodge,Journey AWD,SUV: Small,3.6,6,A6,X,14.5,10.0,12.4,23.0,292.0,3.0,3.0
+2019,Buick,Encore,SUV: Small,1.4,4,AS6,X,9.4,7.8,8.7,32.0,204.0,6.0,5.0
+2019,Jeep,Cherokee 4X4 Active Drive Lock,SUV: Small,3.2,6,A9,X,12.9,9.9,11.6,24.0,269.0,4.0,5.0
+2019,Porsche,911 Carrera S,Minicompact,3,6,M7,Z,12.1,8.3,10.3,27.0,242.0,5.0,1.0
+2019,Hyundai,Tucson AWD,SUV: Small,2.4,4,AS6,X,11.0,9.1,10.1,28.0,240.0,5.0,5.0
+2019,Chrysler,300 AWD,Full-size,3.6,6,A8,X,12.8,8.7,11.0,26.0,258.0,4.0,3.0
+2019,Acura,NSX,Two-seater,3.5,6,AM9,Z,11.1,10.8,11.0,26.0,261.0,4.0,3.0
+2019,Volkswagen,Golf,Compact,1.4,4,M6,X,8.2,6.3,7.4,38.0,172.0,7.0,7.0
+2019,Honda,Civic Hatchback,Full-size,1.5,4,M6,X,8.0,6.2,7.2,39.0,167.0,8.0,3.0
+2019,Mercedes-Benz,Metris Cargo,Special purpose vehicle,2,4,A7,Z,11.5,9.8,10.7,26.0,251.0,4.0,5.0
+2019,Kia,Soul,Station wagon: Small,1.6,4,AM7,X,9.1,7.7,8.5,33.0,199.0,6.0,3.0
+2019,MINI,Cooper 5 Door,Subcompact,1.5,3,AS6,Z,8.8,6.8,7.9,36.0,184.0,7.0,7.0
+2019,Hyundai,Elantra,Mid-size,2,4,AS6,X,8.3,6.4,7.4,38.0,174.0,7.0,5.0
+2019,Chevrolet,Camaro SS,Subcompact,6.2,8,AS10,Z,14.5,8.8,12.0,24.0,279.0,4.0,1.0
+2019,Ford,Flex AWD GTDI,SUV: Standard,3.5,6,AS6,X,15.7,11.2,13.7,21.0,322.0,3.0,3.0
+2019,Toyota,RAV4,SUV: Small,2.5,4,AS8,X,8.8,6.7,7.8,36.0,183.0,7.0,6.0
+2019,GMC,Yukon XL 4WD FFV,SUV: Standard,5.3,8,A6,X,16.8,11.3,14.3,20.0,336.0,2.0,3.0
+2019,MINI,Cooper S 5 Door,Subcompact,2,4,M6,Z,10.2,7.4,9.0,31.0,210.0,5.0,7.0
+2019,Hyundai,Accent,Compact,1.6,4,M6,X,8.2,6.3,7.3,39.0,173.0,7.0,3.0
+2019,Acura,TLX SH-AWD,Compact,3.5,6,AS9,Z,11.4,7.7,9.8,29.0,228.0,5.0,3.0
+2019,GMC,Sierra,Pickup truck: Standard,5.3,8,A8,X,14.3,10.4,12.5,23.0,294.0,3.0,5.0
+2019,Mercedes-Benz,Maybach S 650,Full-size,6,12,A7,Z,18.4,11.1,15.1,19.0,355.0,2.0,3.0
+2019,BMW,M4 Coupe,Compact,3,6,M6,Z,13.4,9.6,11.7,24.0,273.0,4.0,3.0
+2019,Ford,Fusion,Mid-size,1.5,4,AS6,X,10.0,7.0,8.7,32.0,204.0,6.0,7.0
+2019,Ford,Edge AWD,SUV: Small,2.7,6,AS8,X,12.6,9.2,11.0,26.0,259.0,4.0,5.0
+2019,Lexus,RX 350 L AWD,SUV: Small,3.5,6,AS8,X,13.1,9.4,11.1,25.0,268.0,4.0,5.0
+2019,Chevrolet,Cruze Hatchback Premier,Mid-size,1.4,4,AS6,X,8.5,6.4,7.5,38.0,175.0,7.0,6.0
+2019,Lamborghini,Huracan Spyder AWD,Two-seater,5.2,10,AM7,Z,17.9,13.0,15.7,18.0,370.0,2.0,1.0
+2019,Ford,F-150 FFV 4X4 (LT Tire Pkg),Pickup truck: Standard,5,8,AS10,E,20.0,15.6,18.0,16.0,300.0,3.0,3.0
+2019,GMC,Canyon,Pickup truck: Small,3.6,6,A8,X,13.4,9.6,11.7,24.0,274.0,4.0,5.0
+2019,Porsche,911 Carrera GTS Cabriolet,Minicompact,3,6,AM7,Z,11.8,9.2,10.7,26.0,249.0,4.0,1.0
+2019,Honda,CR-V AWD,SUV: Small,1.5,4,AV,X,8.7,7.2,8.0,35.0,188.0,6.0,5.0
+2019,Toyota,Tacoma 4WD,Pickup truck: Small,3.5,6,M6,X,13.8,11.4,12.7,22.0,299.0,3.0,5.0
+2019,MINI,Cooper Clubman ALL4,Mid-size,1.5,3,M6,Z,10.5,7.4,9.1,31.0,214.0,5.0,3.0
+2019,Lexus,NX 300h AWD,SUV: Small,2.5,4,AV6,X,7.2,7.9,7.5,38.0,176.0,7.0,7.0
+2019,Chevrolet,Silverado,Pickup truck: Standard,5.3,8,A6,X,15.9,11.4,13.9,20.0,326.0,3.0,5.0
+2019,Nissan,Rogue,SUV: Small,2.5,4,AV,X,9.1,7.1,8.2,34.0,192.0,6.0,7.0
+2019,Porsche,911 Carrera GTS,Minicompact,3,6,M7,Z,13.0,8.9,11.2,25.0,260.0,4.0,1.0
+2019,Nissan,Frontier 4WD,Pickup truck: Small,4,6,M6,X,15.1,11.5,13.5,21.0,317.0,3.0,3.0
+2019,BMW,X6 M,SUV: Standard,4.4,8,AS8,Z,16.6,12.1,14.6,19.0,341.0,2.0,3.0
+2019,Chevrolet,Trax,SUV: Small,1.4,4,AS6,X,9.1,7.6,8.4,34.0,196.0,6.0,5.0
+2019,Jeep,Grand Cherokee 4X4 Trackhawk,SUV: Standard,6.2,8,A8,Z,20.9,13.8,17.7,16.0,413.0,1.0,1.0
+2019,Toyota,RAV4 AWD,SUV: Small,2.5,4,AS8,X,9.2,7.1,8.3,34.0,190.0,6.0,6.0
+2019,Chevrolet,Silverado LD,Pickup truck: Standard,5.3,8,A6,X,15.6,10.9,13.5,21.0,317.0,3.0,3.0
+2019,Honda,Civic Hatchback Sport,Full-size,1.5,4,M6,Z,8.0,6.2,7.2,39.0,167.0,8.0,3.0
+2019,Honda,CR-V,SUV: Small,1.5,4,AV,X,8.4,7.0,7.8,36.0,181.0,7.0,5.0
+2019,Porsche,911 Carrera 4 Cabriolet,Minicompact,3,6,AM7,Z,11.0,8.4,9.8,29.0,230.0,5.0,1.0
+2019,Chevrolet,Impala,Full-size,2.5,4,AS6,X,10.8,8.0,9.6,29.0,225.0,5.0,3.0
+2019,Chevrolet,Suburban 4WD FFV,SUV: Standard,5.3,8,A6,X,16.8,11.3,14.3,20.0,336.0,2.0,3.0
+2019,Dodge,Journey FFV,SUV: Small,3.6,6,A6,X,14.2,9.5,12.1,23.0,284.0,4.0,3.0
+2019,Ford,Transit Connect Wagon LWB,Special purpose vehicle,2,4,AS8,X,9.9,8.2,9.2,31.0,214.0,5.0,6.0
+2019,Audi,S5,Subcompact,3,6,AS8,Z,11.3,8.0,9.8,29.0,230.0,5.0,5.0
+2019,Audi,A8L,Full-size,3,6,AS8,Z,12.5,8.6,10.8,26.0,252.0,4.0,3.0
+2019,Porsche,911 Carrera T,Minicompact,3,6,M7,Z,14.6,9.4,12.3,23.0,286.0,3.0,1.0
+2019,Lexus,UX 200,Mid-size,2,4,AS10,X,8.0,6.3,7.2,39.0,168.0,8.0,6.0
+2019,Jeep,Cherokee 4X4 Active Drive I,SUV: Small,3.2,6,A9,X,12.2,8.6,10.6,27.0,249.0,4.0,5.0
+2019,Dodge,Charger FFV,Full-size,3.6,6,A5,X,13.7,9.0,11.6,24.0,271.0,4.0,3.0
+2019,Lamborghini,Aventador Coupe,Two-seater,6.5,12,AM7,Z,26.3,15.6,21.5,13.0,487.0,1.0,1.0
+2019,Toyota,Corolla,Mid-size,1.8,4,M6,X,8.5,6.6,7.6,37.0,178.0,7.0,3.0
+2019,Cadillac,CT6 AWD,Full-size,3,6,AS10,Z,13.1,9.1,11.3,25.0,267.0,4.0,3.0
+2019,GMC,Yukon XL,SUV: Standard,5.3,8,A6,X,15.7,10.5,13.4,21.0,314.0,3.0,3.0
+2019,Acura,RLX Hybrid,Mid-size,3.5,6,AM7,Z,8.4,8.2,8.4,34.0,196.0,6.0,7.0
+2019,Hyundai,Elantra GT,Full-size,2,4,AS6,X,9.4,7.1,8.4,34.0,200.0,6.0,5.0
+2019,Ford,Fusion Hybrid,Mid-size,2,4,AV,X,5.5,5.6,5.6,50.0,131.0,9.0,7.0
+2019,Ford,Mustang Bullitt,Subcompact,5,8,M6,X,16.1,9.9,13.3,21.0,311.0,3.0,3.0
+2019,Dodge,Charger (MDS),Full-size,5.7,8,A8,X,14.7,9.4,12.3,23.0,289.0,3.0,3.0
+2019,Ford,Explorer FFV AWD,SUV: Standard,3.5,6,AS6,E,19.8,14.3,17.3,16.0,288.0,3.0,3.0
+2019,Jaguar,F-PACE 25t,SUV: Small,2,4,AS8,Z,10.7,8.8,9.9,29.0,227.0,5.0,7.0
+2019,Cadillac,XT4 AWD,SUV: Small,2,4,AS9,Z,10.9,8.2,9.7,29.0,227.0,5.0,6.0
+2019,Dodge,Challenger,Mid-size,5.7,8,M6,Z,15.6,10.1,13.1,22.0,307.0,3.0,1.0
+2019,Hyundai,Elantra,Mid-size,1.6,4,M6,X,10.7,7.8,9.4,30.0,221.0,5.0,3.0
+2019,Jeep,Wrangler JL Unlimited 4X4,SUV: Small,3.6,6,M6,X,13.8,10.1,12.2,23.0,285.0,3.0,5.0
+2019,Lincoln,Continental AWD,Full-size,3,6,AS6,X,14.5,9.8,12.3,23.0,289.0,3.0,5.0
+2019,Mercedes-Benz,A 250,Station wagon: Small,2,4,AM7,Z,9.4,6.8,8.3,34.0,192.0,6.0,5.0
+2019,Nissan,Micra,Compact,1.6,4,M5,X,8.7,6.8,7.9,36.0,186.0,7.0,3.0
+2019,Maserati,Levante,SUV: Standard,3,6,AS8,Z,15.9,11.1,13.7,21.0,324.0,3.0,1.0
+2019,Ford,Fiesta,Subcompact,1.6,4,M5,X,8.8,6.8,7.9,36.0,184.0,7.0,3.0
+2019,Lexus,UX 250h,Compact,2,4,AV6,X,5.5,5.7,5.6,50.0,130.0,9.0,6.0
+2019,Ford,F-150 FFV (LT Tire Pkg),Pickup truck: Standard,3.3,6,AS6,X,12.4,9.8,11.2,25.0,263.0,4.0,5.0
+2019,Mercedes-Benz,GLC 300 4MATIC Coupe,SUV: Small,2,4,A9,Z,10.8,9.0,10.0,28.0,234.0,4.0,5.0
+2019,Porsche,Panamera 4 Executive,Full-size,3,6,AM8,Z,12.4,9.0,10.9,26.0,253.0,4.0,5.0
+2019,Audi,A6 quattro,Mid-size,3,6,AM7,Z,10.7,8.2,9.6,29.0,224.0,5.0,5.0
+2019,Toyota,Camry Hybrid XLE/SE,Mid-size,2.5,4,AV6,X,5.3,5.0,5.1,55.0,121.0,10.0,7.0
+2019,Chevrolet,Silverado FFV,Pickup truck: Standard,5.3,8,A6,X,15.7,11.9,14.0,20.0,329.0,3.0,3.0
+2019,Porsche,Cayenne Turbo,SUV: Standard,4,8,AS8,Z,15.6,12.4,14.1,20.0,329.0,3.0,3.0
+2019,Toyota,Highlander AWD (Start/Stop System),SUV: Standard,3.5,6,AS8,X,12.0,8.9,10.6,27.0,248.0,4.0,5.0
+2019,Ford,F-150 (LT Tire Pkg),Pickup truck: Standard,2.7,6,AS10,X,12.4,9.4,11.1,25.0,260.0,4.0,5.0
+2019,Volkswagen,Arteon 4MOTION,Full-size,2,4,AS8,Z,12.0,8.6,10.4,27.0,244.0,5.0,3.0
+2019,Dodge,Journey FFV,SUV: Small,3.6,6,A6,E,19.1,13.2,16.4,17.0,274.0,4.0,3.0
+2019,Alfa Romeo,Stelvio AWD Quadrifoglio,SUV: Small,2.9,6,A8,Z,14.1,10.4,12.4,23.0,292.0,3.0,3.0
+2019,Hyundai,Sonata,Full-size,2.4,4,AS6,X,9.3,7.1,8.3,34.0,198.0,6.0,7.0
+2019,Jaguar,F-TYPE Coupe,Two-seater,3,6,AS8,Z,11.9,8.5,10.4,27.0,242.0,5.0,7.0
+2019,Ford,F-150 FFV 4X4 (Payload Pkg),Pickup truck: Standard,5,8,AS10,X,16.8,12.4,14.8,19.0,347.0,2.0,3.0
+2019,Porsche,Panamera 4S ST,Full-size,2.9,6,AM8,Z,13.1,9.8,11.6,24.0,273.0,4.0,5.0
+2019,Mercedes-Benz,AMG S 63 4MATIC+ Cabriolet,Subcompact,4,8,A9,Z,15.8,9.8,13.1,22.0,306.0,3.0,5.0
+2019,GMC,Yukon XL FFV,SUV: Standard,5.3,8,A6,E,21.2,13.9,17.9,16.0,298.0,3.0,3.0
+2019,Genesis,G80 AWD,Full-size,3.3,6,AS8,Z,13.8,9.7,11.9,24.0,282.0,4.0,3.0
+2019,BMW,M550i xDrive,Mid-size,4.4,8,AS8,Z,13.3,9.2,11.5,25.0,269.0,4.0,3.0
+2019,Honda,Civic Coupe,Compact,2,4,AV,X,7.8,6.1,7.1,40.0,164.0,8.0,3.0
+2019,Chevrolet,Suburban 4WD,SUV: Standard,5.3,8,A6,X,16.8,11.3,14.3,20.0,336.0,2.0,3.0
+2019,Ram,1500 HFE eTorque,Pickup truck: Standard,3.6,6,A8,X,11.6,9.0,10.4,27.0,246.0,5.0,5.0
+2019,Toyota,Avalon,Mid-size,3.5,6,AS8,X,10.9,7.6,9.4,30.0,220.0,5.0,5.0
+2019,Lincoln,MKZ Hybrid,Mid-size,2,4,AV,X,5.7,6.2,5.9,48.0,139.0,9.0,7.0
+2019,Mercedes-Benz,AMG S 63 4MATIC+ Coupe,Compact,4,8,A9,Z,14.0,8.7,11.6,24.0,271.0,4.0,5.0
+2019,Lexus,RC 350 AWD,Subcompact,3.5,6,AS6,Z,13.1,9.8,11.2,25.0,262.0,4.0,5.0
+2019,Subaru,Legacy AWD,Mid-size,2.5,4,AV7,X,9.3,7.0,8.2,34.0,193.0,6.0,5.0
+2019,Kia,Optima,Full-size,2.4,4,AS6,X,9.5,7.1,8.4,34.0,199.0,6.0,5.0
+2019,Volkswagen,Beetle Dune,Compact,2,4,AS6,X,9.1,6.9,8.1,35.0,189.0,6.0,7.0
+2019,Rolls-Royce,Ghost,Full-size,6.6,12,AS8,Z,20.3,13.0,17.0,17.0,397.0,1.0,3.0
+2019,Honda,Insight EX,Mid-size,1.5,4,AV,X,4.6,5.3,4.9,58.0,114.0,10.0,7.0
+2019,Lexus,LS 500h AWD,Mid-size,3.5,6,AV10,Z,10.3,7.7,9.1,31.0,214.0,5.0,7.0
+2019,Porsche,Cayman S,Two-seater,2.5,4,M6,Z,12.1,9.0,10.7,26.0,249.0,4.0,3.0
+2019,BMW,X1 xDrive28i,SUV: Small,2,4,AS8,Z,10.7,7.5,9.3,30.0,217.0,5.0,7.0
+2019,Mercedes-Benz,AMG GT C Roadster,Two-seater,4,8,AM7,Z,15.2,11.4,13.5,21.0,315.0,3.0,5.0
+2019,Mitsubishi,Outlander 4WD,SUV: Small,2.4,4,AV6,X,9.9,8.1,9.1,31.0,212.0,5.0,5.0
+2019,Dodge,Charger,Full-size,3.6,6,A8,X,12.4,7.8,10.3,27.0,242.0,5.0,3.0
+2019,Ford,F-150 FFV (LT Tire Pkg),Pickup truck: Standard,3.3,6,AS6,E,16.7,12.6,14.9,19.0,247.0,4.0,5.0
+2019,Chevrolet,Tahoe FFV,SUV: Standard,5.3,8,A6,X,15.7,10.5,13.4,21.0,314.0,3.0,3.0
+2019,Dodge,Charger AWD (MDS),Full-size,5.7,8,A5,X,16.0,10.1,13.3,21.0,312.0,3.0,3.0
+2019,Ford,F-150 4X4 (Payload Pkg),Pickup truck: Standard,2.7,6,AS10,X,13.1,10.2,11.8,24.0,277.0,4.0,5.0
+2019,Dodge,Challenger (MDS),Mid-size,5.7,8,A8,X,14.7,9.4,12.3,23.0,289.0,3.0,3.0
+2019,Chevrolet,Spark,Subcompact,1.4,4,AV,X,7.9,6.2,7.1,40.0,167.0,8.0,5.0
+2019,Ford,Edge,SUV: Small,2,4,AS8,X,10.9,8.0,9.6,29.0,224.0,5.0,5.0
+2019,Mercedes-Benz,B 250,Station wagon: Small,2,4,AM7,Z,9.8,6.8,8.4,34.0,196.0,6.0,5.0
+2019,Porsche,911 Carrera S Cabriolet,Minicompact,3,6,AM7,Z,10.8,8.4,9.7,29.0,228.0,5.0,1.0
+2019,BMW,750i xDrive,Full-size,4.4,8,AS8,Z,13.3,9.2,11.5,25.0,269.0,4.0,3.0
+2019,Ford,F-150 FFV,Pickup truck: Standard,5,8,AS10,E,20.3,14.0,17.4,16.0,290.0,3.0,3.0
+2019,Jeep,Compass,SUV: Small,2.4,4,A6,X,10.6,7.6,9.3,30.0,218.0,5.0,5.0
+2019,BMW,M240i Coupe M Performance,Subcompact,3,6,AS8,Z,11.2,7.8,9.7,29.0,227.0,5.0,3.0
+2019,Dodge,Charger FFV,Full-size,3.6,6,A8,X,12.4,7.8,10.3,27.0,242.0,5.0,3.0
+2019,Mazda,CX-5,SUV: Small,2,4,M6,X,9.7,7.7,8.8,32.0,206.0,6.0,3.0
+2019,Audi,A5 Cabriolet quattro,Subcompact,2,4,AM7,Z,10.0,7.0,8.7,32.0,204.0,6.0,5.0
+2019,BMW,440i xDrive Coupe,Compact,3,6,AS8,Z,11.4,7.6,9.7,29.0,228.0,5.0,3.0
+2019,MINI,Cooper S Convertible,Minicompact,2,4,AS6,Z,9.4,7.2,8.4,34.0,197.0,6.0,7.0
+2019,Jeep,Cherokee 4X4 Active Drive I,SUV: Small,2.4,4,A9,X,11.2,8.0,9.8,29.0,230.0,5.0,3.0
+2019,Chevrolet,Malibu,Mid-size,2,4,A9,Z,10.5,7.4,9.1,31.0,214.0,5.0,5.0
+2019,Jeep,Renegade 4X4,SUV: Small,2.4,4,A9,X,11.2,8.2,9.8,29.0,230.0,5.0,5.0
+2019,Ram,ProMaster City,Special purpose vehicle,2.4,4,A9,X,11.2,8.3,9.9,29.0,232.0,5.0,3.0
+2019,Mercedes-Benz,SL 450,Two-seater,3,6,A9,Z,11.8,8.5,10.3,27.0,241.0,5.0,3.0
+2019,Chevrolet,Impala,Full-size,3.6,6,AS6,X,12.7,8.5,10.8,26.0,254.0,4.0,5.0
+2019,Dodge,Journey,SUV: Small,2.4,4,A4,X,12.7,9.2,11.1,25.0,261.0,4.0,3.0
+2019,Chevrolet,Camaro ZL1,Subcompact,6.2,8,M6,Z,17.2,12.0,14.9,19.0,349.0,2.0,1.0
+2019,MINI,Cooper Countryman ALL4,Station wagon: Small,1.5,3,AS8,Z,10.3,7.9,9.2,31.0,215.0,5.0,3.0
+2019,Chevrolet,Trax,SUV: Small,1.4,4,M6,X,9.4,6.9,8.3,34.0,194.0,6.0,5.0
+2019,GMC,Yukon 4WD FFV,SUV: Standard,5.3,8,A6,E,21.7,14.3,18.4,15.0,305.0,3.0,3.0
+2019,Dodge,Charger,Full-size,3.6,6,A5,X,13.7,9.0,11.6,24.0,271.0,4.0,3.0
+2019,Porsche,911 Carrera 4S,Minicompact,3,6,M7,Z,12.1,8.4,10.4,27.0,243.0,5.0,1.0
+2019,Porsche,Cayenne,SUV: Standard,3,6,AS8,Z,12.5,10.0,11.4,25.0,265.0,4.0,5.0
+2019,Chevrolet,Cruze Premier,Compact,1.4,4,AS6,X,8.3,6.2,7.3,39.0,172.0,7.0,6.0
+2019,Chevrolet,Silverado FFV,Pickup truck: Standard,5.3,8,A6,E,21.1,15.0,18.4,15.0,306.0,3.0,3.0
+2019,Chevrolet,Camaro,Subcompact,2,4,M6,Z,11.9,7.9,10.1,28.0,235.0,5.0,5.0
+2019,GMC,Terrain AWD,SUV: Small,2,4,A9,Z,11.2,9.0,10.2,28.0,239.0,5.0,5.0
