@@ -1,0 +1,90 @@
+# Installation et chargement des bibliothèques nécessaires
+install.packages("dplyr")
+install.packages("ggplot2")
+install.packages("readr")
+install.packages("broom")  # Pour faciliter l'extraction des résultats des modèles
+
+library(dplyr)
+library(ggplot2)
+library(readr)
+library(broom)
+
+# Spécifier le chemin où se trouvent vos fichiers CSV
+chemin_donnees <- "C:/Users/lalop/OneDrive/Documentos/SCI 1402/"
+
+# Liste des fichiers CSV des échantillons
+fichiers_echantillons <- c('Sample_1_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2017_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2017_Fuel_Consumption_Ratings.csv',
+                           'Sample_1_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2023_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2023_Fuel_Consumption_Ratings.csv')
+
+# Créer un dataframe vide pour combiner toutes les données
+combined_data <- data.frame()
+
+# Boucle pour lire chaque échantillon et combiner les données
+for (fichier in fichiers_echantillons) {
+  data <- read_csv(paste0(chemin_donnees, fichier))
+  combined_data <- rbind(combined_data, data)
+}
+
+# Fonction pour exécuter la régression linéaire pour chaque variable dépendante et exporter les résultats
+effectuer_regressions <- function(annee, echantillon_num, data, chemin_donnees) {
+  cat("\n#### Régressions pour l'année ", annee, " et l'échantillon ", echantillon_num, " ####\n")
+  
+  # Filtrer les données pour l'année et l'échantillon actuel
+  data_filtre <- data %>%
+    filter(Year == annee)
+
+  # Régression pour la consommation en ville
+  modele_city <- lm(`Fuel Consumption (City) (L/100 km)` ~ `Engine Size (L)` + Cylinders + Transmission + `Fuel Type` + `Vehicle Class`, data = data_filtre)
+  resultats_city <- tidy(modele_city)
+  
+  # Régression pour la consommation sur autoroute
+  modele_hwy <- lm(`Fuel Consumption (Hwy) (L/100 km)` ~ `Engine Size (L)` + Cylinders + Transmission + `Fuel Type` + `Vehicle Class`, data = data_filtre)
+  resultats_hwy <- tidy(modele_hwy)
+
+  # Régression pour la consommation combinée
+  modele_comb <- lm(`Fuel Consumption (Comb) (L/100 km)` ~ `Engine Size (L)` + Cylinders + Transmission + `Fuel Type` + `Vehicle Class`, data = data_filtre)
+  resultats_comb <- tidy(modele_comb)
+
+  # Régression pour les émissions de CO2
+  modele_co2 <- lm(`CO2 Emissions (g/km)` ~ `Engine Size (L)` + Cylinders + Transmission + `Fuel Type` + `Vehicle Class`, data = data_filtre)
+  resultats_co2 <- tidy(modele_co2)
+
+  # Nom de base des fichiers à exporter
+  fichier_base <- paste0(chemin_donnees, "Linear_Regression_Sample_", echantillon_num, "_Completed_MY", annee, "_Fuel_Consumption_Ratings")
+
+  # Exportation des résultats pour chaque régression
+  write.csv(resultats_city, file = paste0(fichier_base, "_City.csv"))
+  write.table(resultats_city, file = paste0(fichier_base, "_City.txt"), sep = "\t")
+
+  write.csv(resultats_hwy, file = paste0(fichier_base, "_Hwy.csv"))
+  write.table(resultats_hwy, file = paste0(fichier_base, "_Hwy.txt"), sep = "\t")
+
+  write.csv(resultats_comb, file = paste0(fichier_base, "_Comb.csv"))
+  write.table(resultats_comb, file = paste0(fichier_base, "_Comb.txt"), sep = "\t")
+
+  write.csv(resultats_co2, file = paste0(fichier_base, "_CO2.csv"))
+  write.table(resultats_co2, file = paste0(fichier_base, "_CO2.txt"), sep = "\t")
+}
+
+# Boucle pour exécuter les régressions pour chaque année de 2015 à 2023 et pour les deux échantillons
+for (annee in 2015:2023) {
+  for (echantillon_num in 1:2) {
+    effectuer_regressions(annee, echantillon_num, combined_data, chemin_donnees)
+  }
+}
