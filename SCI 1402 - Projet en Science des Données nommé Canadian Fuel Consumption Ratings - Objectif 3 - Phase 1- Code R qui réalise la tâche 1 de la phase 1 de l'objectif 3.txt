@@ -1,0 +1,67 @@
+# Charger les bibliothèques nécessaires
+library(dplyr)
+library(readr)
+
+# Spécifier le chemin où se trouvent vos fichiers CSV
+chemin_donnees <- "C:/Users/lalop/OneDrive/Documentos/SCI 1402/"
+
+# Liste des fichiers CSV des échantillons
+fichiers_echantillons <- c('Sample_1_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2017_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2017_Fuel_Consumption_Ratings.csv',
+                           'Sample_1_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2023_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2023_Fuel_Consumption_Ratings.csv')
+
+# Créer un dataframe vide pour stocker les données regroupées
+vehicules_regroupes <- data.frame()
+
+# Boucle pour traiter chaque échantillon
+for (fichier in fichiers_echantillons) {
+  # Charger l'échantillon CSV
+  data <- read_csv(paste0(chemin_donnees, fichier))
+  
+  # Regrouper les véhicules par type de carburant et classe de véhicule (en utilisant les noms de colonnes exacts)
+  regroupement <- data %>%
+    group_by(`Fuel Type`, `Vehicle Class`) %>%
+    summarise(Count = n())  # Nombre de véhicules dans chaque catégorie
+  
+  # Ajouter les données au dataframe global
+  vehicules_regroupes <- rbind(vehicules_regroupes, regroupement)
+  
+  # Afficher toutes les données regroupées dans la console pour chaque fichier
+  print(paste("Résultats de la classification pour", fichier, ":"))
+  print(regroupement, n = Inf)  # Afficher toutes les lignes
+  
+  # Exporter chaque résultat dans un fichier CSV avec le format de nom souhaité
+  fichier_sortie <- paste0(chemin_donnees, "Vehicles_Classification_Per_Fuel_Type_", gsub(" ", "_", fichier))
+  write_csv(regroupement, paste0(fichier_sortie, ".csv"))
+  
+  # Message de confirmation d'exportation
+  print(paste(fichier_sortie, ".csv a été créé avec succès."))
+}
+
+# Exporter les résultats globaux dans un fichier CSV
+fichier_sortie_global <- paste0(chemin_donnees, "Vehicles_Classification_Global_Per_Fuel_Type.csv")
+write_csv(vehicules_regroupes, fichier_sortie_global)
+
+# Afficher tous les résultats regroupés dans la console R
+print("Résultats globaux de la classification des véhicules par type de carburant et classe :")
+
+# Message de confirmation d'exportation globale
+print(vehicules_regroupes, n = 50)  # Afficher 50 lignes de la classification globale
+print(paste(fichier_sortie_global, ".csv a été créé avec succès."))
+
+print(vehicules_regroupes, n = Inf) # Afficher toutes les lignes globalement #Garder cette ligne pour voir la classification globale des véhicules par type de carburant et par classe de véhicule
