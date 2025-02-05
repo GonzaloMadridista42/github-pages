@@ -1,0 +1,148 @@
+# Installation et chargement des bibliothèques nécessaires
+install.packages("car")
+install.packages("stats")
+install.packages("dplyr")
+install.packages("readr")
+install.packages("writexl")
+
+library(car)
+library(stats)
+library(dplyr)
+library(readr)
+library(writexl)
+
+# Spécifier le chemin où se trouvent vos fichiers CSV
+chemin_donnees <- "C:/Users/lalop/OneDrive/Documentos/SCI 1402/"
+
+# Liste des fichiers CSV des échantillons
+fichiers_echantillons <- c('Sample_1_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2017_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2017_Fuel_Consumption_Ratings.csv',
+                           'Sample_1_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2023_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2023_Fuel_Consumption_Ratings.csv')
+
+# Créer des dataframes vides pour stocker les résultats globaux
+resultats_kruskal_global <- data.frame()
+resultats_t_tests_global <- data.frame()
+
+# Fonction pour effectuer le test de Kruskal-Wallis pour différentes catégories de véhicules
+kruskal_wallis_test <- function(data, fichier_sortie_txt, fichier_sortie_csv) {
+  # Test de Kruskal-Wallis pour la consommation en ville, sur autoroute, et combinée
+  resultats_kw_city <- kruskal.test(`Fuel Consumption (City) (L/100 km)` ~ `Fuel Type`, data = data)
+  resultats_kw_hwy <- kruskal.test(`Fuel Consumption (Hwy) (L/100 km)` ~ `Fuel Type`, data = data)
+  resultats_kw_comb <- kruskal.test(`Fuel Consumption (Comb) (L/100 km)` ~ `Fuel Type`, data = data)
+  resultats_kw_co2 <- kruskal.test(`CO2 Emissions (g/km)` ~ `Fuel Type`, data = data)
+  
+  # Exporter les résultats dans un fichier texte
+  writeLines(capture.output(resultats_kw_city, resultats_kw_hwy, resultats_kw_comb, resultats_kw_co2), paste0(chemin_donnees, fichier_sortie_txt, ".txt"))
+  
+  # Exporter les résultats dans un fichier CSV
+  resultats_kw_df <- data.frame(
+    Test = c("Kruskal-Wallis City", "Kruskal-Wallis Hwy", "Kruskal-Wallis Comb", "Kruskal-Wallis CO2"),
+    Statistic = c(resultats_kw_city$statistic, resultats_kw_hwy$statistic, resultats_kw_comb$statistic, resultats_kw_co2$statistic),
+    P_Value = c(resultats_kw_city$p.value, resultats_kw_hwy$p.value, resultats_kw_comb$p.value, resultats_kw_co2$p.value)
+  )
+  write_csv(resultats_kw_df, paste0(chemin_donnees, fichier_sortie_csv, ".csv"))
+  
+  # Ajouter les résultats au dataframe global
+  resultats_kruskal_global <<- rbind(resultats_kruskal_global, resultats_kw_df)
+  
+  # Message de réussite
+  print(paste("Test de Kruskal-Wallis réussi pour", fichier_sortie_csv))
+  
+  return(list(city = resultats_kw_city, hwy = resultats_kw_hwy, comb = resultats_kw_comb, co2 = resultats_kw_co2))
+}
+
+# Fonction pour effectuer les tests t entre 2015 et les autres années
+test_t_comparaison_annees <- function(data_2015, data_autres, fichier_sortie_txt, fichier_sortie_csv) {
+  resultats_tests_t <- list()
+  
+  # Comparaison consommation en ville entre 2015 et les autres années
+  test_t_ville <- t.test(data_2015$`Fuel Consumption (City) (L/100 km)`, data_autres$`Fuel Consumption (City) (L/100 km)`)
+  resultats_tests_t$ville = test_t_ville
+  
+  # Comparaison consommation sur autoroute entre 2015 et les autres années
+  test_t_autoroute <- t.test(data_2015$`Fuel Consumption (Hwy) (L/100 km)`, data_autres$`Fuel Consumption (Hwy) (L/100 km)`)
+  resultats_tests_t$autoroute = test_t_autoroute
+  
+  # Comparaison consommation combinée entre 2015 et les autres années
+  test_t_comb <- t.test(data_2015$`Fuel Consumption (Comb) (L/100 km)`, data_autres$`Fuel Consumption (Comb) (L/100 km)`)
+  resultats_tests_t$comb = test_t_comb
+  
+  # Comparaison émissions de CO2 entre 2015 et les autres années
+  test_t_co2 <- t.test(data_2015$`CO2 Emissions (g/km)`, data_autres$`CO2 Emissions (g/km)`)
+  resultats_tests_t$co2 = test_t_co2
+  
+  # Exporter les résultats dans un fichier texte
+  writeLines(capture.output(resultats_tests_t), paste0(chemin_donnees, fichier_sortie_txt, ".txt"))
+  
+  # Exporter les résultats dans un fichier CSV
+  resultats_t_df <- data.frame(
+    Test = c("T-Test City", "T-Test Hwy", "T-Test Comb", "T-Test CO2"),
+    Statistic = c(test_t_ville$statistic, test_t_autoroute$statistic, test_t_comb$statistic, test_t_co2$statistic),
+    P_Value = c(test_t_ville$p.value, test_t_autoroute$p.value, test_t_comb$p.value, test_t_co2$p.value)
+  )
+  write_csv(resultats_t_df, paste0(chemin_donnees, fichier_sortie_csv, ".csv"))
+  
+  # Ajouter les résultats au dataframe global
+  resultats_t_tests_global <<- rbind(resultats_t_tests_global, resultats_t_df)
+  
+  # Message de réussite
+  print(paste("Test t réussi pour", fichier_sortie_csv))
+  
+  return(resultats_tests_t)
+}
+
+# Boucle pour traiter chaque échantillon et effectuer les tests
+for (fichier in fichiers_echantillons) {
+  # Charger l'échantillon CSV
+  data <- read_csv(paste0(chemin_donnees, fichier))
+  
+  # Si c'est un fichier de l'année 2015, on le garde pour les comparaisons ultérieures
+  if (grepl("MY2015", fichier)) {
+    data_2015 <- data
+  } else {
+    # Créer le nom de fichier de sortie pour les résultats
+    fichier_sortie_kw <- paste0("Kruskal_Wallis_", gsub(" ", "_", fichier))
+    fichier_sortie_t <- paste0("T_Test_", gsub(" ", "_", fichier))
+    
+    # Effectuer le test de Kruskal-Wallis pour les différentes catégories de véhicules
+    print(paste("Test de Kruskal-Wallis pour", fichier, ":"))
+    resultats_kw <- kruskal_wallis_test(data, fichier_sortie_kw, fichier_sortie_kw)
+    
+    # Effectuer les tests t entre l'année 2015 et l'année en cours
+    print(paste("Tests t pour", fichier, "par rapport à 2015:"))
+    resultats_tests_t <- test_t_comparaison_annees(data_2015, data, fichier_sortie_t, fichier_sortie_t)
+  }
+}
+
+# Exporter les résultats globaux des tests Kruskal-Wallis
+fichier_sortie_global_kruskal_csv <- paste0(chemin_donnees, "Kruskal_Wallis_Results_Global.csv")
+fichier_sortie_global_kruskal_txt <- paste0(chemin_donnees, "Kruskal_Wallis_Results_Global.txt")
+
+write_csv(resultats_kruskal_global, fichier_sortie_global_kruskal_csv)
+writeLines(capture.output(print(resultats_kruskal_global)), fichier_sortie_global_kruskal_txt)
+
+# Exporter les résultats globaux des tests t
+fichier_sortie_global_t_csv <- paste0(chemin_donnees, "T_Test_Results_Global.csv")
+fichier_sortie_global_t_txt <- paste0(chemin_donnees, "T_Test_Results_Global.txt")
+
+write_csv(resultats_t_tests_global, fichier_sortie_global_t_csv)
+writeLines(capture.output(print(resultats_t_tests_global)), fichier_sortie_global_t_txt)
+
+# Message de confirmation d'exportation globale
+print(paste(fichier_sortie_global_kruskal_csv, "et", fichier_sortie_global_kruskal_txt, "ont été créés avec succès."))
+print(paste(fichier_sortie_global_t_csv, "et", fichier_sortie_global_t_txt, "ont été créés avec succès."))
