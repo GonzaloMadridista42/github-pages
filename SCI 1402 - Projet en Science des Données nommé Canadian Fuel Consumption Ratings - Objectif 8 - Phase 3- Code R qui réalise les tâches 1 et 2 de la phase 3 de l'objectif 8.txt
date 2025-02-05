@@ -1,0 +1,161 @@
+# Installation et chargement des bibliothèques nécessaires
+install.packages("dplyr")
+install.packages("ggplot2")
+install.packages("readr")
+
+library(dplyr)
+library(ggplot2)
+library(readr)
+
+# Option pour afficher toutes les colonnes dans la console
+options(tibble.width = Inf)  # Affiche toutes les colonnes sans limite
+
+# Spécifier le chemin où se trouvent vos fichiers CSV
+chemin_donnees <- "C:/Users/lalop/OneDrive/Documentos/SCI 1402/"
+
+# Liste des fichiers CSV des échantillons
+fichiers_echantillons <- c('Sample_1_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2017_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2017_Fuel_Consumption_Ratings.csv',
+                           'Sample_1_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2023_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2023_Fuel_Consumption_Ratings.csv')
+
+# Créer un dataframe vide pour combiner toutes les données
+combined_data <- data.frame()
+
+# Boucle pour lire chaque échantillon et combiner les données
+for (fichier in fichiers_echantillons) {
+  data <- read_csv(paste0(chemin_donnees, fichier))
+  combined_data <- rbind(combined_data, data)
+}
+
+# Segmenter les données par type de transmission, nombre de cylindres et année
+stats_summary <- combined_data %>%
+  group_by(Transmission, Cylinders, Year) %>%
+  summarise(
+    Moyenne_City = mean(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE),
+    Mediane_City = median(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE),
+    Ecart_Type_City = sd(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE),
+    Mode_City = as.numeric(names(sort(table(`Fuel Consumption (City) (L/100 km)`), decreasing = TRUE)[1])),
+    Etendue_City = diff(range(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE)),
+    CV_City = (sd(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE) / mean(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE)) * 100,
+    
+    Moyenne_Hwy = mean(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE),
+    Mediane_Hwy = median(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE),
+    Ecart_Type_Hwy = sd(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE),
+    Mode_Hwy = as.numeric(names(sort(table(`Fuel Consumption (Hwy) (L/100 km)`), decreasing = TRUE)[1])),
+    Etendue_Hwy = diff(range(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE)),
+    CV_Hwy = (sd(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE) / mean(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE)) * 100,
+    
+    Moyenne_Comb = mean(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE),
+    Mediane_Comb = median(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE),
+    Ecart_Type_Comb = sd(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE),
+    Mode_Comb = as.numeric(names(sort(table(`Fuel Consumption (Comb) (L/100 km)`), decreasing = TRUE)[1])),
+    Etendue_Comb = diff(range(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE)),
+    CV_Comb = (sd(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE) / mean(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE)) * 100,
+    
+    Moyenne_CO2 = mean(`CO2 Emissions (g/km)`, na.rm = TRUE),
+    Mediane_CO2 = median(`CO2 Emissions (g/km)`, na.rm = TRUE),
+    Ecart_Type_CO2 = sd(`CO2 Emissions (g/km)`, na.rm = TRUE),
+    Mode_CO2 = as.numeric(names(sort(table(`CO2 Emissions (g/km)`), decreasing = TRUE)[1])),
+    Etendue_CO2 = diff(range(`CO2 Emissions (g/km)`, na.rm = TRUE)),
+    CV_CO2 = (sd(`CO2 Emissions (g/km)`, na.rm = TRUE) / mean(`CO2 Emissions (g/km)`, na.rm = TRUE)) * 100
+  )
+
+# Exporter les résultats des statistiques descriptives vers un fichier CSV
+write.csv(stats_summary, file = paste0(chemin_donnees, "Descriptive_Statistics_Transmission_Cylinders_Samples_1_And_2_Completed_MY2015_2023_Fuel_Consumption_Ratings.csv"), row.names = FALSE)
+
+# Exporter les résultats des statistiques descriptives vers un fichier TXT
+write.table(stats_summary, file = paste0(chemin_donnees, "Descriptive_Statistics_Transmission_Cylinders_Samples_1_And_2_Completed_MY2015_2023_Fuel_Consumption_Ratings.txt"), sep = "\t", row.names = FALSE, quote = FALSE)
+
+# Message de succès
+print("Exportation des statistiques descriptives complétée pour CSV et TXT avec le nom de fichier demandé.")
+
+# Visualiser les tendances avec des graphiques linéaires pour la consommation en ville
+ggplot(stats_summary, aes(x = Year, y = Moyenne_City, color = Transmission, group = Transmission)) +
+  geom_line() +
+  geom_point() +
+  labs(title = "Évolution de la consommation de carburant en ville par transmission",
+       x = "Année",
+       y = "Consommation en ville (L/100 km)") +
+  theme_minimal()
+
+# Visualiser les tendances pour les émissions de CO2
+ggplot(stats_summary, aes(x = Year, y = Moyenne_CO2, color = Transmission, group = Transmission)) +
+  geom_line() +
+  geom_point() +
+  labs(title = "Évolution des émissions de CO2 par transmission",
+       x = "Année",
+       y = "Émissions de CO2 (g/km)") +
+  theme_minimal()
+
+# Visualiser les tendances pour la consommation sur autoroute
+ggplot(stats_summary, aes(x = Year, y = Moyenne_Hwy, color = Transmission, group = Transmission)) +
+  geom_line() +
+  geom_point() +
+  labs(title = "Évolution de la consommation de carburant sur autoroute par transmission",
+       x = "Année",
+       y = "Consommation sur autoroute (L/100 km)") +
+  theme_minimal()
+
+# Visualiser les tendances pour la consommation combinée
+ggplot(stats_summary, aes(x = Year, y = Moyenne_Comb, color = Transmission, group = Transmission)) +
+  geom_line() +
+  geom_point() +
+  labs(title = "Évolution de la consommation de carburant combinée par transmission",
+       x = "Année",
+       y = "Consommation combinée (L/100 km)") +
+  theme_minimal()
+
+# Visualiser les tendances avec des graphiques linéaires pour la consommation en ville par nombre de cylindres
+ggplot(stats_summary, aes(x = Year, y = Moyenne_City, color = as.factor(Cylinders), group = Cylinders)) +
+  geom_line() +
+  geom_point() +
+  labs(title = "Évolution de la consommation de carburant en ville par nombre de cylindres",
+       x = "Année",
+       y = "Consommation en ville (L/100 km)",
+       color = "Nombre de cylindres") +
+  theme_minimal()
+
+# Visualiser les tendances pour les émissions de CO2 par nombre de cylindres
+ggplot(stats_summary, aes(x = Year, y = Moyenne_CO2, color = as.factor(Cylinders), group = Cylinders)) +
+  geom_line() +
+  geom_point() +
+  labs(title = "Évolution des émissions de CO2 par nombre de cylindres",
+       x = "Année",
+       y = "Émissions de CO2 (g/km)",
+       color = "Nombre de cylindres") +
+  theme_minimal()
+
+# Visualiser les tendances pour la consommation sur autoroute par nombre de cylindres
+ggplot(stats_summary, aes(x = Year, y = Moyenne_Hwy, color = as.factor(Cylinders), group = Cylinders)) +
+  geom_line() +
+  geom_point() +
+  labs(title = "Évolution de la consommation de carburant sur autoroute par nombre de cylindres",
+       x = "Année",
+       y = "Consommation sur autoroute (L/100 km)",
+       color = "Nombre de cylindres") +
+  theme_minimal()
+
+# Visualiser les tendances pour la consommation combinée par nombre de cylindres
+ggplot(stats_summary, aes(x = Year, y = Moyenne_Comb, color = as.factor(Cylinders), group = Cylinders)) +
+  geom_line() +
+  geom_point() +
+  labs(title = "Évolution de la consommation de carburant combinée par nombre de cylindres",
+       x = "Année",
+       y = "Consommation combinée (L/100 km)",
+       color = "Nombre de cylindres") +
+  theme_minimal()
