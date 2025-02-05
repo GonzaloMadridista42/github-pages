@@ -1,0 +1,136 @@
+# Installation des packages nécessaires
+install.packages("tseries")
+install.packages("car")
+install.packages("stats")
+install.packages("nortest")  # Pour le test d'Anderson-Darling
+
+# Charger les bibliothèques
+library(tseries)
+library(car)
+library(stats)
+library(nortest)
+library(dplyr)
+library(readr)
+library(writexl)
+
+# Spécifier le chemin où se trouvent vos fichiers CSV
+chemin_donnees <- "C:/Users/lalop/OneDrive/Documentos/SCI 1402/"
+
+# Liste des fichiers CSV des échantillons
+fichiers_echantillons <- c('Sample_1_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2017_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2017_Fuel_Consumption_Ratings.csv',
+                           'Sample_1_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2023_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2023_Fuel_Consumption_Ratings.csv')
+
+# Charger tous les échantillons et les combiner en un seul dataframe
+tendances_annuelles <- data.frame()
+
+for (fichier in fichiers_echantillons) {
+  data <- read.csv(paste0(chemin_donnees, fichier))
+  
+  # Sélectionner les colonnes nécessaires et convertir "Year" en facteur
+  data <- data %>%
+    select(Year, Fuel.Consumption..City...L.100.km., Fuel.Consumption..Hwy...L.100.km., Fuel.Consumption..Comb...L.100.km., CO2.Emissions..g.km.) %>%
+    mutate(Year = as.factor(Year))
+  
+  # Ajouter les données au dataframe global
+  tendances_annuelles <- rbind(tendances_annuelles, data)
+}
+
+# ---- Test t pour chaque paire d'années ----
+# Liste des comparaisons
+comparaisons <- c("2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023")
+
+# Comparaison des paires d'années (2015 vs chaque année de la liste)
+for (annee in comparaisons) {
+  data_2015 <- subset(tendances_annuelles, Year == "2015")
+  data_autre <- subset(tendances_annuelles, Year == annee)
+  
+  # Création des noms de fichiers
+  fichier_sortie_t_city <- paste0("T_Test_Samples_1_And_2_Completed_MY2015_vs_MY", annee, "_Fuel_Consumption_City_Ratings")
+  fichier_sortie_t_hwy <- paste0("T_Test_Samples_1_And_2_Completed_MY2015_vs_MY", annee, "_Fuel_Consumption_Hwy_Ratings")
+  fichier_sortie_t_comb <- paste0("T_Test_Samples_1_And_2_Completed_MY2015_vs_MY", annee, "_Fuel_Consumption_Comb_Ratings")
+  
+  # Test t pour la consommation en ville
+  test_t_ville <- t.test(data_2015$Fuel.Consumption..City...L.100.km., data_autre$Fuel.Consumption..City...L.100.km.)
+  print(paste("Test t entre l'année 2015 et l'année", annee, "pour la consommation en ville :"))
+  print(test_t_ville)
+  writeLines(capture.output(test_t_ville), paste0(chemin_donnees, fichier_sortie_t_city, ".txt"))
+  write_csv(as.data.frame(test_t_ville$statistic), paste0(chemin_donnees, fichier_sortie_t_city, ".csv"))
+  
+  # Test t pour la consommation sur autoroute
+  test_t_autoroute <- t.test(data_2015$Fuel.Consumption..Hwy...L.100.km., data_autre$Fuel.Consumption..Hwy...L.100.km.)
+  print(paste("Test t entre l'année 2015 et l'année", annee, "pour la consommation sur autoroute :"))
+  print(test_t_autoroute)
+  writeLines(capture.output(test_t_autoroute), paste0(chemin_donnees, fichier_sortie_t_hwy, ".txt"))
+  write_csv(as.data.frame(test_t_autoroute$statistic), paste0(chemin_donnees, fichier_sortie_t_hwy, ".csv"))
+  
+  # Test t pour la consommation combinée
+  test_t_comb <- t.test(data_2015$Fuel.Consumption..Comb...L.100.km., data_autre$Fuel.Consumption..Comb...L.100.km.)
+  print(paste("Test t entre l'année 2015 et l'année", annee, "pour la consommation combinée :"))
+  print(test_t_comb)
+  writeLines(capture.output(test_t_comb), paste0(chemin_donnees, fichier_sortie_t_comb, ".txt"))
+  write_csv(as.data.frame(test_t_comb$statistic), paste0(chemin_donnees, fichier_sortie_t_comb, ".csv"))
+  
+  # Test t pour les émissions de CO2
+  test_t_co2 <- t.test(data_2015$CO2.Emissions..g.km., data_autre$CO2.Emissions..g.km.)
+  fichier_sortie_t_co2 <- paste0("T_Test_Samples_1_And_2_Completed_MY2015_vs_MY", annee, "_CO2_Emissions_Ratings")
+  print(paste("Test t entre l'année 2015 et l'année", annee, "pour les émissions de CO2 :"))
+  print(test_t_co2)
+  writeLines(capture.output(test_t_co2), paste0(chemin_donnees, fichier_sortie_t_co2, ".txt"))
+  write_csv(as.data.frame(test_t_co2$statistic), paste0(chemin_donnees, fichier_sortie_t_co2, ".csv"))
+}
+
+# ---- Analyse Kruskal-Wallis ----
+# Comparaison simultanée de toutes les années pour la consommation en ville, sur autoroute et combinée
+
+# Création des noms de fichiers pour Kruskal-Wallis
+fichier_sortie_kw_city <- paste0("Kruskal_Wallis_Samples_1_And_2_Completed_MY2015_2023_Fuel_Consumption_City_Ratings")
+fichier_sortie_kw_hwy <- paste0("Kruskal_Wallis_Samples_1_And_2_Completed_MY2015_2023_Fuel_Consumption_Hwy_Ratings")
+fichier_sortie_kw_comb <- paste0("Kruskal_Wallis_Samples_1_And_2_Completed_MY2015_2023_Fuel_Consumption_Comb_Ratings")
+fichier_sortie_kw_co2 <- paste0("Kruskal_Wallis_Samples_1_And_2_Completed_MY2015_2023_CO2_Emissions_Ratings")
+
+# Kruskal-Wallis pour la consommation de carburant en ville
+kruskal_result_ville <- kruskal.test(Fuel.Consumption..City...L.100.km. ~ Year, data = tendances_annuelles)
+print("Résultats du test de Kruskal-Wallis pour la consommation en ville sur plusieurs années :")
+print(kruskal_result_ville)
+writeLines(capture.output(kruskal_result_ville), paste0(chemin_donnees, fichier_sortie_kw_city, ".txt"))
+write_csv(as.data.frame(kruskal_result_ville$statistic), paste0(chemin_donnees, fichier_sortie_kw_city, ".csv"))
+
+# Kruskal-Wallis pour la consommation de carburant sur autoroute
+kruskal_result_autoroute <- kruskal.test(Fuel.Consumption..Hwy...L.100.km. ~ Year, data = tendances_annuelles)
+print("Résultats du test de Kruskal-Wallis pour la consommation sur autoroute sur plusieurs années :")
+print(kruskal_result_autoroute)
+writeLines(capture.output(kruskal_result_autoroute), paste0(chemin_donnees, fichier_sortie_kw_hwy, ".txt"))
+write_csv(as.data.frame(kruskal_result_autoroute$statistic), paste0(chemin_donnees, fichier_sortie_kw_hwy, ".csv"))
+
+# Kruskal-Wallis pour la consommation de carburant combinée
+kruskal_result_comb <- kruskal.test(Fuel.Consumption..Comb...L.100.km. ~ Year, data = tendances_annuelles)
+print("Résultats du test de Kruskal-Wallis pour la consommation combinée sur plusieurs années :")
+print(kruskal_result_comb)
+writeLines(capture.output(kruskal_result_comb), paste0(chemin_donnees, fichier_sortie_kw_comb, ".txt"))
+write_csv(as.data.frame(kruskal_result_comb$statistic), paste0(chemin_donnees, fichier_sortie_kw_comb, ".csv"))
+
+# Kruskal-Wallis pour les émissions de CO2
+kruskal_result_co2 <- kruskal.test(CO2.Emissions..g.km. ~ Year, data = tendances_annuelles)
+print("Résultats du test de Kruskal-Wallis pour les émissions de CO2 sur plusieurs années :")
+print(kruskal_result_co2)
+writeLines(capture.output(kruskal_result_co2), paste0(chemin_donnees, fichier_sortie_kw_co2, ".txt"))
+write_csv(as.data.frame(kruskal_result_co2$statistic), paste0(chemin_donnees, fichier_sortie_kw_co2, ".csv"))
+
+# Résultats finaux
+print("Analyse des tendances annuelles avec test t et test de Kruskal-Wallis complétée.")
