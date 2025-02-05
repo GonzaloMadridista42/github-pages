@@ -1,0 +1,131 @@
+# Installation des packages nécessaires
+install.packages("dplyr")
+install.packages("summarytools")
+install.packages("stats")
+
+# Charger les bibliothèques
+library(dplyr)
+library(summarytools)
+library(stats)
+library(readr)
+library(writexl)
+
+# Spécifier le chemin où se trouvent vos fichiers CSV
+chemin_donnees <- "C:/Users/lalop/OneDrive/Documentos/SCI 1402/"
+
+# Liste des fichiers CSV des échantillons
+fichiers_echantillons <- c('Sample_1_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2017_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2017_Fuel_Consumption_Ratings.csv',
+                           'Sample_1_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2023_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2023_Fuel_Consumption_Ratings.csv')
+
+# Fonction pour effectuer l'analyse descriptive sur les colonnes nécessaires
+analyse_descriptive <- function(data) {
+  data %>%
+    summarise(
+      # Taille du moteur
+      Moyenne_Taille_Moteur = mean(`Engine Size (L)`, na.rm = TRUE),
+      Mediane_Taille_Moteur = median(`Engine Size (L)`, na.rm = TRUE),
+      Ecart_Type_Taille_Moteur = sd(`Engine Size (L)`, na.rm = TRUE),
+      Etendue_Taille_Moteur = max(`Engine Size (L)`, na.rm = TRUE) - min(`Engine Size (L)`, na.rm = TRUE),
+      Q1_Taille_Moteur = quantile(`Engine Size (L)`, 0.25, na.rm = TRUE),
+      Q2_Taille_Moteur = quantile(`Engine Size (L)`, 0.50, na.rm = TRUE),  # Médiane
+      Q3_Taille_Moteur = quantile(`Engine Size (L)`, 0.75, na.rm = TRUE),
+      Q4_Taille_Moteur = max(`Engine Size (L)`, na.rm = TRUE),
+      Coeff_Variation_Taille_Moteur = (sd(`Engine Size (L)`, na.rm = TRUE) / mean(`Engine Size (L)`, na.rm = TRUE)) * 100,
+      
+      # Nombre de cylindres
+      Moyenne_Cylindres = mean(Cylinders, na.rm = TRUE),
+      Mediane_Cylindres = median(Cylinders, na.rm = TRUE),
+      Ecart_Type_Cylindres = sd(Cylinders, na.rm = TRUE),
+      Etendue_Cylindres = max(Cylinders, na.rm = TRUE) - min(Cylinders, na.rm = TRUE),
+      Q1_Cylindres = quantile(Cylinders, 0.25, na.rm = TRUE),
+      Q2_Cylindres = quantile(Cylinders, 0.50, na.rm = TRUE),
+      Q3_Cylindres = quantile(Cylinders, 0.75, na.rm = TRUE),
+      Q4_Cylindres = max(Cylinders, na.rm = TRUE),
+      Coeff_Variation_Cylindres = (sd(Cylinders, na.rm = TRUE) / mean(Cylinders, na.rm = TRUE)) * 100,
+
+      # Transmission (variable qualitative)
+      Mode_Transmission = names(sort(table(Transmission), decreasing = TRUE)[1]), # Mode du type de transmission
+      Transmission_Count = length(unique(Transmission)), # Nombre de types de transmission
+      #Transmission_Frequency = as.numeric(table(Transmission) / length(Transmission) * 100),  # Fréquence des transmissions en %      
+
+      # Consommation de carburant en ville
+      Moyenne_Consommation_Ville = mean(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE),
+      Mediane_Consommation_Ville = median(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE),
+      Ecart_Type_Consommation_Ville = sd(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE),
+      Etendue_Consommation_Ville = max(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE) - min(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE),
+      Q1_Consommation_Ville = quantile(`Fuel Consumption (City) (L/100 km)`, 0.25, na.rm = TRUE),
+      Q2_Consommation_Ville = quantile(`Fuel Consumption (City) (L/100 km)`, 0.50, na.rm = TRUE),  # Médiane
+      Q3_Consommation_Ville = quantile(`Fuel Consumption (City) (L/100 km)`, 0.75, na.rm = TRUE),
+      Q4_Consommation_Ville = max(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE),
+      Coeff_Variation_Consommation_Ville = (sd(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE) / mean(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE)) * 100,
+
+      # Consommation de carburant sur autoroute
+      Moyenne_Consommation_Autoroute = mean(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE),
+      Mediane_Consommation_Autoroute = median(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE),
+      Ecart_Type_Consommation_Autoroute = sd(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE),
+      Etendue_Consommation_Autoroute = max(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE) - min(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE),
+      Q1_Consommation_Autoroute = quantile(`Fuel Consumption (Hwy) (L/100 km)`, 0.25, na.rm = TRUE),
+      Q2_Consommation_Autoroute = quantile(`Fuel Consumption (Hwy) (L/100 km)`, 0.50, na.rm = TRUE),
+      Q3_Consommation_Autoroute = quantile(`Fuel Consumption (Hwy) (L/100 km)`, 0.75, na.rm = TRUE),
+      Q4_Consommation_Autoroute = max(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE),
+      Coeff_Variation_Consommation_Autoroute = (sd(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE) / mean(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE)) * 100,
+      
+      # Consommation de carburant combinée
+      Moyenne_Consommation_Comb = mean(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE),
+      Mediane_Consommation_Comb = median(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE),
+      Ecart_Type_Consommation_Comb = sd(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE),
+      Etendue_Consommation_Comb = max(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE) - min(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE),
+      Q1_Consommation_Comb = quantile(`Fuel Consumption (Comb) (L/100 km)`, 0.25, na.rm = TRUE),
+      Q2_Consommation_Comb = quantile(`Fuel Consumption (Comb) (L/100 km)`, 0.50, na.rm = TRUE),  # Médiane
+      Q3_Consommation_Comb = quantile(`Fuel Consumption (Comb) (L/100 km)`, 0.75, na.rm = TRUE),
+      Q4_Consommation_Comb = max(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE),
+      Coeff_Variation_Consommation_Comb = (sd(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE) / mean(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE)) * 100,
+
+      # Émissions de CO2
+      Moyenne_Emissions_CO2 = mean(`CO2 Emissions (g/km)`, na.rm = TRUE),
+      Mediane_Emissions_CO2 = median(`CO2 Emissions (g/km)`, na.rm = TRUE),
+      Ecart_Type_Emissions_CO2 = sd(`CO2 Emissions (g/km)`, na.rm = TRUE),
+      Etendue_Emissions_CO2 = max(`CO2 Emissions (g/km)`, na.rm = TRUE) - min(`CO2 Emissions (g/km)`, na.rm = TRUE),
+      Q1_Emissions_CO2 = quantile(`CO2 Emissions (g/km)`, 0.25, na.rm = TRUE),
+      Q2_Emissions_CO2 = quantile(`CO2 Emissions (g/km)`, 0.50, na.rm = TRUE),  # Médiane
+      Q3_Emissions_CO2 = quantile(`CO2 Emissions (g/km)`, 0.75, na.rm = TRUE),
+      Q4_Emissions_CO2 = max(`CO2 Emissions (g/km)`, na.rm = TRUE),
+      Coeff_Variation_Emissions_CO2 = (sd(`CO2 Emissions (g/km)`, na.rm = TRUE) / mean(`CO2 Emissions (g/km)`, na.rm = TRUE)) * 100
+      ) 
+}
+
+# Boucle pour traiter chaque échantillon et effectuer l'analyse descriptive
+for (fichier in fichiers_echantillons) {
+  # Charger l'échantillon CSV
+  data <- read_csv(paste0(chemin_donnees, fichier))
+  
+  # Effectuer l'analyse descriptive
+  print(paste("Analyse descriptive pour", fichier, ":"))
+  stats <- analyse_descriptive(data)
+  
+  # Sauvegarder les résultats dans un fichier CSV
+  fichier_sortie_csv <- paste0(chemin_donnees, 'Descriptive_Stats_', gsub(" ", "_", fichier), ".csv")
+  write_csv(stats, fichier_sortie_csv)
+  print(paste(fichier_sortie_csv, "a été créé avec succès."))
+  
+  # Sauvegarder les résultats dans un fichier TXT
+  fichier_sortie_txt <- paste0(chemin_donnees, 'Descriptive_Stats_', gsub(" ", "_", fichier), ".txt")
+  write.table(stats, fichier_sortie_txt, sep = "\t", row.names = FALSE, quote = FALSE)
+  print(paste(fichier_sortie_txt, "a été créé avec succès."))
+}
