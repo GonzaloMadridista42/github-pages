@@ -1,0 +1,111 @@
+# Installation des packages nécessaires
+install.packages("car")
+install.packages("dplyr")
+install.packages("readr")
+
+# Charger les bibliothèques
+library(dplyr)
+library(readr)
+library(car)
+
+# Spécifier le chemin où se trouvent vos fichiers CSV
+chemin_donnees <- "C:/Users/lalop/OneDrive/Documentos/SCI 1402/"
+
+# Liste des fichiers CSV des échantillons
+fichiers_echantillons <- c('Sample_1_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2017_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2017_Fuel_Consumption_Ratings.csv',
+                           'Sample_1_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2023_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2023_Fuel_Consumption_Ratings.csv')
+
+# Fonction pour effectuer une régression linéaire simple et exporter les résultats
+modele_regression_simple <- function(data, var_predictive, fichier_sortie_base) {
+  
+  # Formule de régression linéaire simple
+  formule <- as.formula(paste("`CO2 Emissions (g/km)` ~ `", var_predictive, "` + `Engine Size (L)` + `Fuel Type`", sep = ""))
+  
+  # Ajuster le modèle de régression linéaire
+  modele <- lm(formule, data = data)
+  
+  # Afficher le résumé du modèle dans la console
+  print(summary(modele))
+  
+  # Exporter les résultats vers un fichier texte
+  sink(paste0(chemin_donnees, fichier_sortie_base, ".txt"))
+  print(summary(modele))
+  sink()
+  
+  # Exporter les coefficients dans un fichier CSV
+  resultats <- summary(modele)$coefficients
+  write_csv(as.data.frame(resultats), paste0(chemin_donnees, fichier_sortie_base, ".csv"))
+  
+  # Afficher la confirmation de la création des fichiers
+  print(paste(fichier_sortie_base, ".txt et", fichier_sortie_base, ".csv ont été créés avec succès."))
+}
+
+# Fonction pour effectuer le test de Kruskal-Wallis sur chaque prédicteur
+test_kruskal_wallis <- function(data, var_predictive, fichier_sortie_base) {
+  
+  # Test de Kruskal-Wallis pour "Fuel Type"
+  kw_test_fuel_type <- kruskal.test(as.formula(paste("`", var_predictive, "` ~ `Fuel Type`", sep = "")), data = data)
+  
+  # Test de Kruskal-Wallis pour "Engine Size (L)"
+  kw_test_engine_size <- kruskal.test(as.formula(paste("`", var_predictive, "` ~ `Engine Size (L)`", sep = "")), data = data)
+  
+  # Exporter les résultats vers un fichier texte
+  sink(paste0(chemin_donnees, "Kruskal_Wallis_", fichier_sortie_base, ".txt"))
+  cat("Test de Kruskal-Wallis pour Fuel Type:\n")
+  print(kw_test_fuel_type)
+  cat("\nTest de Kruskal-Wallis pour Engine Size (L):\n")
+  print(kw_test_engine_size)
+  sink()
+  
+  # Afficher la confirmation de la création des fichiers
+  print(paste("Le test de Kruskal-Wallis a été effectué et exporté pour", fichier_sortie_base))
+}
+
+# Boucle pour traiter chaque échantillon et effectuer la régression et le test de Kruskal-Wallis
+for (fichier in fichiers_echantillons) {
+  # Charger l'échantillon CSV
+  data <- read_csv(paste0(chemin_donnees, fichier))
+  
+  # Créer les noms de fichiers de sortie pour les résultats
+  base_nom_fichier <- gsub(" ", "_", fichier)
+  
+  fichier_sortie_base_ville <- paste0("Linear_Regression_Ville_", base_nom_fichier)
+  fichier_sortie_base_hwy <- paste0("Linear_Regression_Hwy_", base_nom_fichier)
+  fichier_sortie_base_comb <- paste0("Linear_Regression_Comb_", base_nom_fichier)
+  
+  # Effectuer la régression linéaire simple pour chaque type de consommation
+  print(paste("Modélisation pour la consommation en ville pour", fichier, ":"))
+  modele_regression_simple(data, "Fuel Consumption (City) (L/100 km)", fichier_sortie_base_ville)
+  
+  print(paste("Modélisation pour la consommation sur autoroute pour", fichier, ":"))
+  modele_regression_simple(data, "Fuel Consumption (Hwy) (L/100 km)", fichier_sortie_base_hwy)
+  
+  print(paste("Modélisation pour la consommation combinée pour", fichier, ":"))
+  modele_regression_simple(data, "Fuel Consumption (Comb) (L/100 km)", fichier_sortie_base_comb)
+  
+  # Effectuer le test de Kruskal-Wallis pour chaque prédicteur
+  print(paste("Test de Kruskal-Wallis pour la consommation en ville pour", fichier, ":"))
+  test_kruskal_wallis(data, "Fuel Consumption (City) (L/100 km)", fichier_sortie_base_ville)
+  
+  print(paste("Test de Kruskal-Wallis pour la consommation sur autoroute pour", fichier, ":"))
+  test_kruskal_wallis(data, "Fuel Consumption (Hwy) (L/100 km)", fichier_sortie_base_hwy)
+  
+  print(paste("Test de Kruskal-Wallis pour la consommation combinée pour", fichier, ":"))
+  test_kruskal_wallis(data, "Fuel Consumption (Comb) (L/100 km)", fichier_sortie_base_comb)
+}
