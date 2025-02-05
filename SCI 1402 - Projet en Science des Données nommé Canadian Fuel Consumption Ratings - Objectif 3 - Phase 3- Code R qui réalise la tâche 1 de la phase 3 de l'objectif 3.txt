@@ -1,0 +1,110 @@
+# Installation des packages nécessaires
+install.packages("ggplot2")
+install.packages("dplyr")
+install.packages("readr")
+
+# Charger les bibliothèques
+library(ggplot2)
+library(dplyr)
+library(readr)
+
+# Spécifier le chemin où se trouvent vos fichiers CSV
+chemin_donnees <- "C:/Users/lalop/OneDrive/Documentos/SCI 1402/"
+
+# Liste des fichiers CSV des échantillons
+fichiers_echantillons <- c('Sample_1_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2017_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2017_Fuel_Consumption_Ratings.csv',
+                           'Sample_1_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2023_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2023_Fuel_Consumption_Ratings.csv')
+
+# Charger tous les échantillons et les combiner en un seul dataframe
+tendances_annuelles <- data.frame()
+
+for (fichier in fichiers_echantillons) {
+  data <- read_csv(paste0(chemin_donnees, fichier))
+  
+  # Sélectionner les colonnes nécessaires (en remplaçant par les noms exacts)
+  data <- data %>%
+    select(`Fuel Type`, `Fuel Consumption (City) (L/100 km)`, 
+           `Fuel Consumption (Hwy) (L/100 km)`, `Fuel Consumption (Comb) (L/100 km)`, 
+           `CO2 Emissions (g/km)`)
+  
+  # Ajouter les données au dataframe global
+  tendances_annuelles <- rbind(tendances_annuelles, data)
+}
+
+# ---- Visualisation des résultats ----
+# Comparer les médianes de consommation de carburant et des émissions de CO2 par type de carburant
+
+# 1. Diagramme en barres pour la médiane de consommation en ville
+ggplot(tendances_annuelles, aes(x = `Fuel Type`, y = `Fuel Consumption (City) (L/100 km)`, fill = `Fuel Type`)) +
+  stat_summary(fun = "median", geom = "bar", position = position_dodge(width = 0.9)) +
+  labs(title = "Médiane de la consommation de carburant en ville par type de carburant",
+       x = "Type de carburant", y = "Consommation en ville (L/100 km)") +
+  theme_minimal()
+
+# 2. Diagramme en barres pour la médiane de consommation sur autoroute
+ggplot(tendances_annuelles, aes(x = `Fuel Type`, y = `Fuel Consumption (Hwy) (L/100 km)`, fill = `Fuel Type`)) +
+  stat_summary(fun = "median", geom = "bar", position = position_dodge(width = 0.9)) +
+  labs(title = "Médiane de la consommation de carburant sur autoroute par type de carburant",
+       x = "Type de carburant", y = "Consommation sur autoroute (L/100 km)") +
+  theme_minimal()
+
+# 3. Diagramme en barres pour la médiane de consommation combinée
+ggplot(tendances_annuelles, aes(x = `Fuel Type`, y = `Fuel Consumption (Comb) (L/100 km)`, fill = `Fuel Type`)) +
+  stat_summary(fun = "median", geom = "bar", position = position_dodge(width = 0.9)) +
+  labs(title = "Médiane de la consommation de carburant combinée par type de carburant",
+       x = "Type de carburant", y = "Consommation combinée (L/100 km)") +
+  theme_minimal()
+
+# 4. Diagramme en barres pour la médiane des émissions de CO2
+ggplot(tendances_annuelles, aes(x = `Fuel Type`, y = `CO2 Emissions (g/km)`, fill = `Fuel Type`)) +
+  stat_summary(fun = "median", geom = "bar", position = position_dodge(width = 0.9)) +
+  labs(title = "Médiane des émissions de CO2 par type de carburant",
+       x = "Type de carburant", y = "Émissions de CO2 (g/km)") +
+  theme_minimal()
+
+# 5. Boîte à moustaches pour la consommation en ville
+ggplot(tendances_annuelles, aes(x = `Fuel Type`, y = `Fuel Consumption (City) (L/100 km)`, fill = `Fuel Type`)) +
+  geom_boxplot() +
+  labs(title = "Comparaison des consommations en ville par type de carburant (boîte à moustaches)",
+       x = "Type de carburant", y = "Consommation en ville (L/100 km)") +
+  theme_minimal()
+
+# 6. Boîte à moustaches pour la consommation sur autoroute
+ggplot(tendances_annuelles, aes(x = `Fuel Type`, y = `Fuel Consumption (Hwy) (L/100 km)`, fill = `Fuel Type`)) +
+  geom_boxplot() +
+  labs(title = "Comparaison des consommations sur autoroute par type de carburant (boîte à moustaches)",
+       x = "Type de carburant", y = "Consommation sur autoroute (L/100 km)") +
+  theme_minimal()
+
+# 7. Boîte à moustaches pour la consommation combinée
+ggplot(tendances_annuelles, aes(x = `Fuel Type`, y = `Fuel Consumption (Comb) (L/100 km)`, fill = `Fuel Type`)) +
+  geom_boxplot() +
+  labs(title = "Comparaison des consommations combinées par type de carburant (boîte à moustaches)",
+       x = "Type de carburant", y = "Consommation combinée (L/100 km)") +
+  theme_minimal()
+
+# 8. Boîte à moustaches pour les émissions de CO2
+ggplot(tendances_annuelles, aes(x = `Fuel Type`, y = `CO2 Emissions (g/km)`, fill = `Fuel Type`)) +
+  geom_boxplot() +
+  labs(title = "Comparaison des émissions de CO2 par type de carburant (boîte à moustaches)",
+       x = "Type de carburant", y = "Émissions de CO2 (g/km)") +
+  theme_minimal()
+
+# Afficher les messages de sauvegarde
+print("Les graphiques ont été créés et sauvegardés avec succès.")
