@@ -1,0 +1,85 @@
+# Installation et chargement des bibliothèques nécessaires
+install.packages("car")
+library(dplyr)
+library(car)
+library(readr)
+
+# Spécifier le chemin où se trouvent vos fichiers CSV
+chemin_donnees <- "C:/Users/lalop/OneDrive/Documentos/SCI 1402/"
+
+# Liste des fichiers CSV des échantillons
+fichiers_echantillons <- c('Sample_1_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2017_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2017_Fuel_Consumption_Ratings.csv',
+                           'Sample_1_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2023_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2023_Fuel_Consumption_Ratings.csv')
+
+# Fonction pour effectuer une régression linéaire simple et exporter les résultats dans un fichier texte et CSV
+modele_regression_simple <- function(data, var_caracteristique, var_consommation, fichier_sortie_base) {
+  # Régression linéaire simple entre la variable de caractéristique (ex : taille du moteur) et la variable de consommation de carburant
+  formule <- as.formula(paste("`", var_consommation, "` ~ `", var_caracteristique, "`", sep = ""))
+  modele <- lm(formule, data = data)
+  
+  # Afficher le résumé du modèle dans la console
+  print(summary(modele))
+  
+  # Exporter les résultats vers un fichier texte
+  sink(paste0(chemin_donnees, fichier_sortie_base, ".txt"))
+  print(summary(modele))
+  sink()
+  
+  # Exporter les coefficients dans un fichier CSV
+  resultats <- summary(modele)$coefficients
+  write_csv(as.data.frame(resultats), paste0(chemin_donnees, fichier_sortie_base, ".csv"))
+  
+  # Afficher la confirmation de la création des fichiers
+  print(paste(fichier_sortie_base, ".txt et", fichier_sortie_base, ".csv ont été créés avec succès."))
+}
+
+# Boucle pour traiter chaque échantillon et effectuer les régressions simples sur les caractéristiques des véhicules
+for (fichier in fichiers_echantillons) {
+  # Charger l'échantillon CSV
+  data <- read_csv(paste0(chemin_donnees, fichier))
+  
+  # Créer les noms de fichiers de sortie pour les résultats des régressions simples
+  base_nom_fichier <- gsub(" ", "_", fichier)
+  
+  # Variables de caractéristiques des véhicules
+  caracteristiques <- c("Engine Size (L)", "Cylinders", "Transmission")
+  
+  # Effectuer la régression linéaire simple pour chaque caractéristique sur chaque type de consommation
+  for (caracteristique in caracteristiques) {
+    # Pour la consommation en ville
+    fichier_sortie_base_ville <- paste0("Simple_Linear_Regression_Ville_", caracteristique, "_", base_nom_fichier)
+    print(paste("Modélisation pour la consommation en ville avec la caractéristique", caracteristique, "pour", fichier, ":"))
+    modele_regression_simple(data, caracteristique, "Fuel Consumption (City) (L/100 km)", fichier_sortie_base_ville)
+    
+    # Pour la consommation sur autoroute
+    fichier_sortie_base_hwy <- paste0("Simple_Linear_Regression_Hwy_", caracteristique, "_", base_nom_fichier)
+    print(paste("Modélisation pour la consommation sur autoroute avec la caractéristique", caracteristique, "pour", fichier, ":"))
+    modele_regression_simple(data, caracteristique, "Fuel Consumption (Hwy) (L/100 km)", fichier_sortie_base_hwy)
+    
+    # Pour la consommation combinée
+    fichier_sortie_base_comb <- paste0("Simple_Linear_Regression_Comb_", caracteristique, "_", base_nom_fichier)
+    print(paste("Modélisation pour la consommation combinée avec la caractéristique", caracteristique, "pour", fichier, ":"))
+    modele_regression_simple(data, caracteristique, "Fuel Consumption (Comb) (L/100 km)", fichier_sortie_base_comb)
+    
+    # Pour les émissions de CO2
+    fichier_sortie_base_co2 <- paste0("Simple_Linear_Regression_CO2_", caracteristique, "_", base_nom_fichier)
+    print(paste("Modélisation pour les émissions de CO2 avec la caractéristique", caracteristique, "pour", fichier, ":"))
+    modele_regression_simple(data, caracteristique, "CO2 Emissions (g/km)", fichier_sortie_base_co2)
+  }
+}
