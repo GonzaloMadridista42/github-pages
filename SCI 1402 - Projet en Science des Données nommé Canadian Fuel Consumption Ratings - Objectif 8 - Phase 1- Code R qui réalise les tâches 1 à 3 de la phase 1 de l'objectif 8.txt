@@ -1,0 +1,65 @@
+# Installation et chargement des bibliothèques nécessaires
+install.packages("dplyr")
+install.packages("readr")
+
+library(dplyr)
+library(readr)
+
+# Option pour afficher toutes les colonnes dans la console
+options(tibble.width = Inf)  # Affiche toutes les colonnes sans limite
+
+# Spécifier le chemin où se trouvent vos fichiers CSV
+chemin_donnees <- "C:/Users/lalop/OneDrive/Documentos/SCI 1402/"
+
+# Liste des fichiers CSV des échantillons
+fichiers_echantillons <- c('Sample_1_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2017_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2017_Fuel_Consumption_Ratings.csv',
+                           'Sample_1_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2023_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2023_Fuel_Consumption_Ratings.csv')
+
+# Créer un dataframe vide pour combiner toutes les données
+combined_data <- data.frame()
+
+# Boucle pour lire chaque échantillon et combiner les données
+for (fichier in fichiers_echantillons) {
+  data <- read_csv(paste0(chemin_donnees, fichier))
+  combined_data <- rbind(combined_data, data)
+}
+
+# Identification des valeurs du champ Transmission et Cylinders
+transmission_cylinders <- combined_data %>%
+  select(Transmission, Cylinders) %>%
+  distinct()
+
+# Classification des véhicules selon Transmission et Cylinders
+combined_data_classified <- combined_data %>%
+  mutate(
+    # Création d'une nouvelle variable qui combine Transmission et Cylinders
+    Transmission_Cylinders = paste(Transmission, Cylinders, sep = "_")
+  )
+
+# Visualisation des premières lignes du nouveau dataframe classifié
+print(head(combined_data_classified))
+
+# Exporter les résultats vers un fichier CSV avec toutes les lignes
+write_csv(combined_data_classified, paste0(chemin_donnees, "Classified_Transmission_Cylinders_Samples_1_And_2_Completed_MY2015_2023_Fuel_Consumption_Ratings.csv"))
+
+# Exporter les résultats vers un fichier TXT avec toutes les lignes
+write.table(combined_data_classified, paste0(chemin_donnees, "Classified_Transmission_Cylinders_Samples_1_And_2_Completed_MY2015_2023_Fuel_Consumption_Ratings.txt"), sep = "\t", row.names = FALSE, quote = FALSE)
+
+# Afficher le message indiquant que l'exportation est terminée
+print("Exportation complète de toutes les lignes vers CSV et TXT.")
