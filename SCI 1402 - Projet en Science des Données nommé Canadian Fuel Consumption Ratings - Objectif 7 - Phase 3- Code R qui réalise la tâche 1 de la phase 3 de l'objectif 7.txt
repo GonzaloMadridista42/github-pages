@@ -1,0 +1,109 @@
+# Installation et chargement des bibliothèques nécessaires
+install.packages("dplyr")
+install.packages("ggplot2")
+install.packages("readr")
+install.packages("stats")
+
+library(dplyr)
+library(ggplot2)
+library(readr)
+library(stats)
+
+# Option pour afficher toutes les colonnes dans la console
+options(tibble.width = Inf)  # Affiche toutes les colonnes sans limite
+
+# Spécifier le chemin où se trouvent vos fichiers CSV
+chemin_donnees <- "C:/Users/lalop/OneDrive/Documentos/SCI 1402/"
+
+# Liste des fichiers CSV des échantillons
+fichiers_echantillons <- c('Sample_1_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2017_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2017_Fuel_Consumption_Ratings.csv',
+                           'Sample_1_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2023_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2023_Fuel_Consumption_Ratings.csv')
+
+# Créer un dataframe vide pour combiner toutes les données
+combined_data <- data.frame()
+
+# Boucle pour lire chaque échantillon et combiner les données
+for (fichier in fichiers_echantillons) {
+  data <- read_csv(paste0(chemin_donnees, fichier))
+  combined_data <- rbind(combined_data, data)
+}
+
+# ----- Test T pour chaque année (comparaison 2015 avec chaque autre année) -----
+perform_t_test <- function(data, year1, year2) {
+  # Comparer deux années avec un test T
+  data_year1 <- filter(data, Year == year1)
+  data_year2 <- filter(data, Year == year2)
+  
+  t_test_result <- t.test(data_year1$`Fuel Consumption (City) (L/100 km)`, 
+                          data_year2$`Fuel Consumption (City) (L/100 km)`, 
+                          var.equal = TRUE)
+  
+  return(t_test_result)
+}
+
+# Exporter les résultats du test T vers CSV et TXT
+export_t_test_results <- function(result, sample_name, year1, year2) {
+  # Convertir les résultats en dataframe
+  t_test_df <- data.frame(
+    Statistique = result$statistic,
+    p_value = result$p.value,
+    Mean_diff = result$estimate[1] - result$estimate[2]
+  )
+  
+  # Exporter vers des fichiers CSV et TXT
+  write_csv(t_test_df, paste0(chemin_donnees, "T_Test_", sample_name, "_MY", year1, "_vs_MY", year2, "_Fuel_Consumption_Ratings.csv"))
+  writeLines(capture.output(result), paste0(chemin_donnees, "T_Test_", sample_name, "_MY", year1, "_vs_MY", year2, "_Fuel_Consumption_Ratings.txt"))
+}
+
+# Comparer 2015 à chaque année de 2016 à 2023 pour Sample 1 et Sample 2
+for (year in 2016:2023) {
+  t_result_sample1 <- perform_t_test(combined_data, 2015, year)
+  t_result_sample2 <- perform_t_test(combined_data, 2015, year)
+  
+  export_t_test_results(t_result_sample1, "Sample_1", 2015, year)
+  export_t_test_results(t_result_sample2, "Sample_2", 2015, year)
+}
+
+# ----- Test de Kruskal-Wallis sur toutes les années simultanément -----
+kruskal_result <- kruskal.test(`Fuel Consumption (City) (L/100 km)` ~ Year, data = combined_data)
+
+# Afficher les résultats du test de Kruskal-Wallis
+print(kruskal_result)
+
+# Fonction pour exporter les résultats par année
+export_kruskal_results <- function(data, sample_name, year) {
+  # Convertir les résultats du test en dataframe
+  kruskal_df <- data.frame(
+    Statistique = kruskal_result$statistic,
+    p_value = kruskal_result$p.value
+  )
+  
+  # Exporter les résultats dans des fichiers CSV et TXT
+  write_csv(kruskal_df, paste0(chemin_donnees, "Kruskal_Wallis_", sample_name, "_Completed_MY", year, "_Fuel_Consumption_Ratings.csv"))
+  writeLines(capture.output(kruskal_result), paste0(chemin_donnees, "Kruskal_Wallis_", sample_name, "_Completed_MY", year, "_Fuel_Consumption_Ratings.txt"))
+}
+
+# Appliquer la fonction d'exportation pour chaque année et chaque échantillon (Sample 1 et Sample 2)
+for (year in 2015:2023) {
+  export_kruskal_results(combined_data, "Sample_1", year)
+  export_kruskal_results(combined_data, "Sample_2", year)
+}
+
+# Message de réussite
+print("Tests T et Kruskal-Wallis terminés, résultats exportés avec succès.")
