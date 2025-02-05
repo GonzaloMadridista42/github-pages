@@ -1,0 +1,246 @@
+# Installation et chargement des bibliothèques nécessaires
+install.packages("dplyr")
+install.packages("readr")
+install.packages("ggplot2")
+
+library(dplyr)
+library(readr)
+library(ggplot2)
+
+# Option pour afficher toutes les colonnes dans la console
+options(tibble.width = Inf)  # Affiche toutes les colonnes sans limite
+
+# Spécifier le chemin où se trouvent vos fichiers CSV
+chemin_donnees <- "C:/Users/lalop/OneDrive/Documentos/SCI 1402/"
+
+# Liste des fichiers CSV des échantillons
+fichiers_echantillons <- c('Sample_1_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2017_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2017_Fuel_Consumption_Ratings.csv',
+                           'Sample_1_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2023_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2023_Fuel_Consumption_Ratings.csv')
+
+# Créer un dataframe vide pour combiner toutes les données
+combined_data <- data.frame()
+
+# Boucle pour lire chaque échantillon et combiner les données
+for (fichier in fichiers_echantillons) {
+  data <- read_csv(paste0(chemin_donnees, fichier))
+  combined_data <- rbind(combined_data, data)
+}
+
+# Calcul des statistiques descriptives pour chaque marque et modèle
+statistiques_descriptives <- combined_data %>%
+  group_by(Make, Model) %>%
+  summarize(
+    Moyenne_CO2 = mean(`CO2 Emissions (g/km)`, na.rm = TRUE),
+    Mediane_CO2 = median(`CO2 Emissions (g/km)`, na.rm = TRUE),
+    Ecart_Type_CO2 = sd(`CO2 Emissions (g/km)`, na.rm = TRUE),
+    Mode_CO2 = as.numeric(names(sort(table(`CO2 Emissions (g/km)`), decreasing = TRUE)[1])),
+    Etendue_CO2 = diff(range(`CO2 Emissions (g/km)`, na.rm = TRUE)),
+    CV_CO2 = sd(`CO2 Emissions (g/km)`, na.rm = TRUE) / mean(`CO2 Emissions (g/km)`, na.rm = TRUE) * 100, # Coefficient de variation
+
+    Moyenne_City = mean(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE),
+    Mediane_City = median(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE),
+    Ecart_Type_City = sd(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE),
+    Mode_City = as.numeric(names(sort(table(`Fuel Consumption (City) (L/100 km)`), decreasing = TRUE)[1])),
+    Etendue_City = diff(range(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE)),
+    CV_City = sd(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE) / mean(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE) * 100,
+
+    Moyenne_Hwy = mean(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE),
+    Mediane_Hwy = median(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE),
+    Ecart_Type_Hwy = sd(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE),
+    Mode_Hwy = as.numeric(names(sort(table(`Fuel Consumption (Hwy) (L/100 km)`), decreasing = TRUE)[1])),
+    Etendue_Hwy = diff(range(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE)),
+    CV_Hwy = sd(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE) / mean(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE) * 100,
+
+    Moyenne_Comb = mean(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE),
+    Mediane_Comb = median(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE),
+    Ecart_Type_Comb = sd(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE),
+    Mode_Comb = as.numeric(names(sort(table(`Fuel Consumption (Comb) (L/100 km)`), decreasing = TRUE)[1])),
+    Etendue_Comb = diff(range(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE)),
+    CV_Comb = sd(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE) / mean(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE) * 100
+  )
+
+# Identifier les meilleures performances
+meilleures_performances <- statistiques_descriptives %>%
+  arrange(Moyenne_CO2, Moyenne_City, Moyenne_Hwy, Moyenne_Comb)
+
+# Afficher les statistiques descriptives et les meilleures performances dans la console
+print(statistiques_descriptives, n = Inf)  # Afficher toutes les lignes et colonnes
+print(meilleures_performances, n = Inf)  # Afficher toutes les lignes et colonnes
+
+# Exporter toutes les lignes des résultats des statistiques descriptives vers un fichier CSV
+write_csv(statistiques_descriptives, paste0(chemin_donnees, "Statistiques_Descriptives_MaKes_Models_Years_2015_2023.csv"))
+
+# Exporter toutes les lignes des meilleures performances vers un fichier CSV
+write_csv(meilleures_performances, paste0(chemin_donnees, "Meilleures_Performances_MaKes_Models_Years_2015_2023.csv"))
+
+# Exporter toutes les lignes des résultats des statistiques descriptives vers un fichier texte
+writeLines(capture.output(print(statistiques_descriptives, n = Inf)), paste0(chemin_donnees, "Statistiques_Descriptives_MaKes_Models_Years_2015_2023.txt"))
+
+# Exporter toutes les lignes des meilleures performances vers un fichier texte
+writeLines(capture.output(print(meilleures_performances, n = Inf)), paste0(chemin_donnees, "Meilleures_Performances_MaKes_Models_Years_2015_2023.txt"))
+
+# Message de réussite
+print("Analyse statistique descriptive et comparative des marques et modèles réalisée avec succès.")
+
+# ---- Création des graphiques ----
+
+# 1. Diagrammes en boîte à moustaches
+
+# Consommation en ville
+ggplot(combined_data, aes(x = interaction(Make, Model), y = `Fuel Consumption (City) (L/100 km)`)) +
+  geom_boxplot() +
+  labs(title = "Consommation en ville (L/100 km) par marque et modèle", 
+       x = "Marque et modèle", 
+       y = "Consommation en ville (L/100 km)") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+# Consommation sur autoroute
+ggplot(combined_data, aes(x = interaction(Make, Model), y = `Fuel Consumption (Hwy) (L/100 km)`)) +
+  geom_boxplot() +
+  labs(title = "Consommation sur autoroute (L/100 km) par marque et modèle", 
+       x = "Marque et modèle", 
+       y = "Consommation sur autoroute (L/100 km)") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+# Consommation combinée
+ggplot(combined_data, aes(x = interaction(Make, Model), y = `Fuel Consumption (Comb) (L/100 km)`)) +
+  geom_boxplot() +
+  labs(title = "Consommation combinée (L/100 km) par marque et modèle", 
+       x = "Marque et modèle", 
+       y = "Consommation combinée (L/100 km)") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+# Émissions de CO2
+ggplot(combined_data, aes(x = interaction(Make, Model), y = `CO2 Emissions (g/km)`)) +
+  geom_boxplot() +
+  labs(title = "Émissions de CO2 (g/km) par marque et modèle", 
+       x = "Marque et modèle", 
+       y = "Émissions de CO2 (g/km)") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+# 2. Graphiques à lignes
+
+# Consommation en ville par année
+ggplot(combined_data, aes(x = Year, y = `Fuel Consumption (City) (L/100 km)`, color = interaction(Make, Model))) +
+  geom_line() +
+  labs(title = "Consommation en ville par année, marque et modèle", 
+       x = "Année", 
+       y = "Consommation en ville (L/100 km)", 
+       color = "Marque et modèle") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Consommation sur autoroute par année
+ggplot(combined_data, aes(x = Year, y = `Fuel Consumption (Hwy) (L/100 km)`, color = interaction(Make, Model))) +
+  geom_line() +
+  labs(title = "Consommation sur autoroute par année, marque et modèle", 
+       x = "Année", 
+       y = "Consommation sur autoroute (L/100 km)", 
+       color = "Marque et modèle") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Consommation combinée par année
+ggplot(combined_data, aes(x = Year, y = `Fuel Consumption (Comb) (L/100 km)`, color = interaction(Make, Model))) +
+  geom_line() +
+  labs(title = "Consommation combinée par année, marque et modèle", 
+       x = "Année", 
+       y = "Consommation combinée (L/100 km)", 
+       color = "Marque et modèle") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Émissions de CO2 par année
+ggplot(combined_data, aes(x = Year, y = `CO2 Emissions (g/km)`, color = interaction(Make, Model))) +
+  geom_line() +
+  labs(title = "Émissions de CO2 par année, marque et modèle", 
+       x = "Année", 
+       y = "Émissions de CO2 (g/km)", 
+       color = "Marque et modèle") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# 3. Nuages de points
+
+# Consommation en ville vs émissions de CO2 par marque et modèle
+ggplot(combined_data, aes(x = `Fuel Consumption (City) (L/100 km)`, y = `CO2 Emissions (g/km)`, color = interaction(Make, Model), shape = as.factor(Year))) +
+  geom_point(alpha = 0.6) +
+  labs(title = "Consommation en ville vs Émissions de CO2 par marque et modèle", 
+       x = "Consommation en ville (L/100 km)", 
+       y = "Émissions de CO2 (g/km)", 
+       color = "Marque et modèle", 
+       shape = "Année") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Consommation sur autoroute vs émissions de CO2 par marque et modèle
+ggplot(combined_data, aes(x = `Fuel Consumption (Hwy) (L/100 km)`, y = `CO2 Emissions (g/km)`, color = interaction(Make, Model), shape = as.factor(Year))) +
+  geom_point(alpha = 0.6) +
+  labs(title = "Consommation sur autoroute vs Émissions de CO2 par marque et modèle", 
+       x = "Consommation sur autoroute (L/100 km)", 
+       y = "Émissions de CO2 (g/km)", 
+       color = "Marque et modèle", 
+       shape = "Année") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Consommation combinée vs émissions de CO2 par marque et modèle
+ggplot(combined_data, aes(x = `Fuel Consumption (Comb) (L/100 km)`, y = `CO2 Emissions (g/km)`, color = interaction(Make, Model), shape = as.factor(Year))) +
+  geom_point(alpha = 0.6) +
+  labs(title = "Consommation combinée vs Émissions de CO2 par marque et modèle", 
+       x = "Consommation combinée (L/100 km)", 
+       y = "Émissions de CO2 (g/km)", 
+       color = "Marque et modèle", 
+       shape = "Année") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# 4. Histogrammes sous forme de barres
+
+# Distribution de la consommation en ville par année, marque et modèle
+ggplot(combined_data, aes(x = `Fuel Consumption (City) (L/100 km)`, fill = interaction(Make, Model))) +
+  geom_histogram(binwidth = 1, position = "dodge") +
+  facet_wrap(~Year) +
+  labs(title = "Distribution de la consommation en ville par année, marque et modèle", 
+       x = "Consommation en ville (L/100 km)", 
+       y = "Fréquence") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Distribution de la consommation sur autoroute par année, marque et modèle
+ggplot(combined_data, aes(x = `Fuel Consumption (Hwy) (L/100 km)`, fill = interaction(Make, Model))) +
+  geom_histogram(binwidth = 1, position = "dodge") +
+  facet_wrap(~Year) +
+  labs(title = "Distribution de la consommation sur autoroute par année, marque et modèle", 
+       x = "Consommation sur autoroute (L/100 km)", 
+       y = "Fréquence") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Distribution de la consommation combinée par année, marque et modèle
+ggplot(combined_data, aes(x = `Fuel Consumption (Comb) (L/100 km)`, fill = interaction(Make, Model))) +
+  geom_histogram(binwidth = 1, position = "dodge") +
+  facet_wrap(~Year) +
+  labs(title = "Distribution de la consommation combinée par année, marque et modèle", 
+       x = "Consommation combinée (L/100 km)", 
+       y = "Fréquence") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Distribution des émissions de CO2 par année, marque et modèle
+ggplot(combined_data, aes(x = `CO2 Emissions (g/km)`, fill = interaction(Make, Model))) +
+  geom_histogram(binwidth = 10, position = "dodge") +
+  facet_wrap(~Year) +
+  labs(title = "Distribution des émissions de CO2 par année, marque et modèle", 
+       x = "Émissions de CO2 (g/km)", 
+       y = "Fréquence") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Message de réussite
+print("Visualisations des données générées avec succès.")
