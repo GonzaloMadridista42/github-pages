@@ -1,0 +1,129 @@
+# Installation et chargement des packages nécessaires
+install.packages("dplyr")
+install.packages("readr")
+install.packages("energy")
+install.packages("summarytools")
+
+library(dplyr)
+library(readr)
+library(energy)
+library(summarytools)
+
+# Spécifier le chemin où se trouvent vos fichiers CSV
+chemin_donnees <- "C:/Users/lalop/OneDrive/Documentos/SCI 1402/"
+
+# Liste des fichiers CSV des échantillons
+fichiers_echantillons <- c('Sample_1_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2017_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2017_Fuel_Consumption_Ratings.csv',
+                           'Sample_1_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2023_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2023_Fuel_Consumption_Ratings.csv')
+
+# Charger et combiner les échantillons
+vehicules_total <- data.frame()
+
+for (fichier in fichiers_echantillons) {
+  data <- read_csv(paste0(chemin_donnees, fichier), show_col_types = FALSE)
+  
+  # Sélectionner les colonnes exactes pour le calcul des corrélations
+  data <- data %>%
+    select(`Fuel Consumption (City) (L/100 km)`, 
+           `Fuel Consumption (Hwy) (L/100 km)`, 
+           `Fuel Consumption (Comb) (L/100 km)`, 
+           `CO2 Emissions (g/km)`, 
+           `Make`, `Vehicle Class`)
+  
+  vehicules_total <- rbind(vehicules_total, data)
+}
+
+# Sélectionner un échantillon représentatif (50% des véhicules)
+set.seed(123)  # Fixer une graine pour la reproductibilité
+vehicules_selectionnes <- vehicules_total %>%
+  sample_frac(0.50)
+
+# ---- Calcul des coefficients de corrélation ----
+
+# Pearson
+results_pearson <- data.frame(
+  `Type de Consommation` = c("City", "Hwy", "Comb"),
+  `Corrélation avec Émissions de CO2` = c(cor(vehicules_selectionnes$`Fuel Consumption (City) (L/100 km)`, 
+                                 vehicules_selectionnes$`CO2 Emissions (g/km)`, method = "pearson"),
+                            cor(vehicules_selectionnes$`Fuel Consumption (Hwy) (L/100 km)`, 
+                                vehicules_selectionnes$`CO2 Emissions (g/km)`, method = "pearson"),
+                            cor(vehicules_selectionnes$`Fuel Consumption (Comb) (L/100 km)`, 
+                                vehicules_selectionnes$`CO2 Emissions (g/km)`, method = "pearson"))
+)
+
+# Spearman
+results_spearman <- data.frame(
+  `Type de Consommation` = c("City", "Hwy", "Comb"),
+  `Corrélation avec Émissions de CO2` = c(cor(vehicules_selectionnes$`Fuel Consumption (City) (L/100 km)`, 
+                                 vehicules_selectionnes$`CO2 Emissions (g/km)`, method = "spearman"),
+                            cor(vehicules_selectionnes$`Fuel Consumption (Hwy) (L/100 km)`, 
+                                vehicules_selectionnes$`CO2 Emissions (g/km)`, method = "spearman"),
+                            cor(vehicules_selectionnes$`Fuel Consumption (Comb) (L/100 km)`, 
+                                vehicules_selectionnes$`CO2 Emissions (g/km)`, method = "spearman"))
+)
+
+# Kendall
+results_kendall <- data.frame(
+  `Type de Consommation` = c("City", "Hwy", "Comb"),
+  `Corrélation avec Émissions de CO2` = c(cor(vehicules_selectionnes$`Fuel Consumption (City) (L/100 km)`, 
+                                 vehicules_selectionnes$`CO2 Emissions (g/km)`, method = "kendall"),
+                            cor(vehicules_selectionnes$`Fuel Consumption (Hwy) (L/100 km)`, 
+                                vehicules_selectionnes$`CO2 Emissions (g/km)`, method = "kendall"),
+                            cor(vehicules_selectionnes$`Fuel Consumption (Comb) (L/100 km)`, 
+                                vehicules_selectionnes$`CO2 Emissions (g/km)`, method = "kendall"))
+)
+
+# Distance correlation (package energy)
+results_distance <- data.frame(
+  `Type_Consommation` = c("City", "Hwy", "Comb"),
+  `Corrélation avec Émissions de CO2` = c(dcor(vehicules_selectionnes$`Fuel Consumption (City) (L/100 km)`, 
+                                  vehicules_selectionnes$`CO2 Emissions (g/km)`),
+                            dcor(vehicules_selectionnes$`Fuel Consumption (Hwy) (L/100 km)`, 
+                                 vehicules_selectionnes$`CO2 Emissions (g/km)`),
+                            dcor(vehicules_selectionnes$`Fuel Consumption (Comb) (L/100 km)`, 
+                                 vehicules_selectionnes$`CO2 Emissions (g/km)`))
+)
+
+# ---- Exporter les résultats ----
+
+# Pearson
+write_csv(results_pearson, paste0(chemin_donnees, "Results_Correlation_Pearson.csv"))
+sink(paste0(chemin_donnees, "Results_Correlation_Pearson.txt"))
+print(results_pearson)
+sink()
+
+# Spearman
+write_csv(results_spearman, paste0(chemin_donnees, "Results_Correlation_Spearman.csv"))
+sink(paste0(chemin_donnees, "Results_Correlation_Spearman.txt"))
+print(results_spearman)
+sink()
+
+# Kendall
+write_csv(results_kendall, paste0(chemin_donnees, "Results_Correlation_Kendall.csv"))
+sink(paste0(chemin_donnees, "Results_Correlation_Kendall.txt"))
+print(results_kendall)
+sink()
+
+# Distance
+write_csv(results_distance, paste0(chemin_donnees, "Results_Correlation_Distance.csv"))
+sink(paste0(chemin_donnees, "Results_Correlation_Distance.txt"))
+print(results_distance)
+sink()
+
+print("Les résultats des corrélations ont été exportés avec succès dans des fichiers .csv et .txt séparés pour chaque mesure de corrélation.")
