@@ -1,0 +1,60 @@
+# Installation et chargement des bibliothèques nécessaires
+install.packages("dplyr")
+install.packages("readr")
+install.packages("writexl")
+
+library(dplyr)
+library(readr)
+library(writexl)
+
+# Spécifier le chemin où se trouvent vos fichiers CSV
+chemin_donnees <- "C:/Users/lalop/OneDrive/Documentos/SCI 1402/"
+
+# Liste des fichiers complets générés après la tâche 1
+fichiers_donnees_completes <- c('Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                                'Completed_MY2016_Fuel_Consumption_Ratings.csv',
+                                'Completed_MY2017_Fuel_Consumption_Ratings.csv',
+                                'Completed_MY2018_Fuel_Consumption_Ratings.csv',
+                                'Completed_MY2019_Fuel_Consumption_Ratings.csv',
+                                'Completed_MY2020_Fuel_Consumption_Ratings.csv',
+                                'Completed_MY2021_Fuel_Consumption_Ratings.csv',
+                                'Completed_MY2022_Fuel_Consumption_Ratings.csv',
+                                'Completed_MY2023_Fuel_Consumption_Ratings.csv')
+
+# Fonction pour réaliser l'échantillonnage double
+echantillonnage_double <- function(data) {
+  # Taille du premier échantillon (50 % de l'ensemble des données)
+  taille_echantillon_1 <- floor(nrow(data) * 0.5)
+  
+  # Tirer au sort le premier échantillon de 50 % de la taille totale des données
+  set.seed(123)  # Fixer la graine pour la reproductibilité
+  echantillon_1 <- sample_n(data, taille_echantillon_1)
+  
+  # Taille du deuxième échantillon (50 % du premier échantillon)
+  taille_echantillon_2 <- floor(taille_echantillon_1 * 0.5)
+  
+  # Tirer au sort le deuxième échantillon de 50 % du premier échantillon
+  set.seed(456)  # Graine différente pour le deuxième échantillon
+  echantillon_2 <- sample_n(echantillon_1, taille_echantillon_2)
+  
+  return(list(echantillon_1 = echantillon_1, echantillon_2 = echantillon_2))
+}
+
+# Boucle pour traiter chaque fichier complet et effectuer l'échantillonnage double
+for (fichier in fichiers_donnees_completes) {
+  # Charger les données complètes depuis le chemin spécifié
+  chemin_complet <- paste0(chemin_donnees, fichier)
+  data <- read_csv(chemin_complet)
+  
+  # Réaliser l'échantillonnage double
+  echantillons <- echantillonnage_double(data)
+  
+  # Enregistrer les échantillons dans des fichiers CSV dans le même répertoire
+  fichier_echantillon_1 <- paste0(chemin_donnees, "Sample_1_", gsub(" ", "_", basename(fichier)))
+  fichier_echantillon_2 <- paste0(chemin_donnees, "Sample_2_", gsub(" ", "_", basename(fichier)))
+  
+  write_csv(echantillons$echantillon_1, fichier_echantillon_1)
+  write_csv(echantillons$echantillon_2, fichier_echantillon_2)
+  
+  print(paste(fichier_echantillon_1, "et", fichier_echantillon_2, "ont été créés avec succès."))
+}
