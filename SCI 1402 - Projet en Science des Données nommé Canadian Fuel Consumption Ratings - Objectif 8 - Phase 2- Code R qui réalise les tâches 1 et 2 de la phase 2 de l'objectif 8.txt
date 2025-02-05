@@ -1,0 +1,195 @@
+# Installation et chargement des bibliothèques nécessaires
+install.packages("dplyr")
+install.packages("ggplot2")
+install.packages("readr")
+install.packages("FSA")  # Pour le test de Kruskal-Wallis
+install.packages("rstatix")  # Pour le test de Dunn
+install.packages("stats")
+
+library(dplyr)
+library(ggplot2)
+library(readr)
+library(FSA)  # Pour le test de Dunn
+library(rstatix)  # Pour le test de Dunn
+library(stats)
+
+# Option pour afficher toutes les colonnes dans la console
+options(tibble.width = Inf)  # Affiche toutes les colonnes sans limite
+
+# Spécifier le chemin où se trouvent vos fichiers CSV
+chemin_donnees <- "C:/Users/lalop/OneDrive/Documentos/SCI 1402/"
+
+# Liste des fichiers CSV des échantillons
+fichiers_echantillons <- c('Sample_1_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2017_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2017_Fuel_Consumption_Ratings.csv',
+                           'Sample_1_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2023_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2023_Fuel_Consumption_Ratings.csv')
+
+# Créer un dataframe vide pour combiner toutes les données
+combined_data <- data.frame()
+
+# Boucle pour lire chaque échantillon et combiner les données
+for (fichier in fichiers_echantillons) {
+  data <- read_csv(paste0(chemin_donnees, fichier))
+  combined_data <- rbind(combined_data, data)
+}
+
+# Classification des véhicules selon Transmission et Cylinders
+combined_data_classified <- combined_data %>%
+  mutate(
+    Transmission_Cylinders = paste(Transmission, Cylinders, sep = "_")
+  )
+
+# Calcul des statistiques descriptives
+stats_summary <- combined_data_classified %>%
+  group_by(Transmission_Cylinders) %>%
+  summarise(
+    Moyenne_City = mean(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE),
+    Mediane_City = median(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE),
+    Ecart_Type_City = sd(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE),
+    Mode_City = as.numeric(names(sort(table(`Fuel Consumption (City) (L/100 km)`), decreasing = TRUE)[1])),
+    Etendue_City = diff(range(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE)),
+    CV_City = sd(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE) / mean(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE) * 100,
+    
+    Moyenne_Hwy = mean(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE),
+    Mediane_Hwy = median(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE),
+    Ecart_Type_Hwy = sd(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE),
+    Mode_Hwy = as.numeric(names(sort(table(`Fuel Consumption (Hwy) (L/100 km)`), decreasing = TRUE)[1])),
+    Etendue_Hwy = diff(range(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE)),
+    CV_Hwy = sd(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE) / mean(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE) * 100,
+    
+    Moyenne_Comb = mean(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE),
+    Mediane_Comb = median(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE),
+    Ecart_Type_Comb = sd(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE),
+    Mode_Comb = as.numeric(names(sort(table(`Fuel Consumption (Comb) (L/100 km)`), decreasing = TRUE)[1])),
+    Etendue_Comb = diff(range(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE)),
+    CV_Comb = sd(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE) / mean(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE) * 100,
+    
+    Moyenne_CO2 = mean(`CO2 Emissions (g/km)`, na.rm = TRUE),
+    Mediane_CO2 = median(`CO2 Emissions (g/km)`, na.rm = TRUE),
+    Ecart_Type_CO2 = sd(`CO2 Emissions (g/km)`, na.rm = TRUE),
+    Mode_CO2 = as.numeric(names(sort(table(`CO2 Emissions (g/km)`), decreasing = TRUE)[1])),
+    Etendue_CO2 = diff(range(`CO2 Emissions (g/km)`, na.rm = TRUE)),
+    CV_CO2 = sd(`CO2 Emissions (g/km)`, na.rm = TRUE) / mean(`CO2 Emissions (g/km)`, na.rm = TRUE) * 100
+  )
+
+# Visualiser les statistiques descriptives
+print(stats_summary)
+
+# Fonction pour extraire les résultats importants du test de Kruskal-Wallis
+extract_kruskal_result <- function(test_result) {
+  data.frame(
+    statistic = test_result$statistic,
+    p.value = test_result$p.value
+  )
+}
+
+# Fonction pour exécuter le test de Kruskal-Wallis
+run_kruskal_test <- function(data, variable, group) {
+  kruskal.test(as.formula(paste("`", variable, "`", "~", group, sep = "")), data = data)
+}
+
+# Fonction pour exécuter le test de Dunn
+run_dunn_test <- function(data, variable, group) {
+  dunn_test(as.formula(paste("`", variable, "`", "~", group, sep = "")), data = data, p.adjust.method = "bonferroni")
+}
+
+# Exécution des tests pour chaque échantillon
+for (fichier in fichiers_echantillons) {
+  data <- read_csv(paste0(chemin_donnees, fichier))
+  
+  # Tests de Kruskal-Wallis et de Dunn pour la consommation de carburant en ville
+  kruskal_city_trans <- run_kruskal_test(data, "Fuel Consumption (City) (L/100 km)", "Transmission")
+  dunn_city_trans <- run_dunn_test(data, "Fuel Consumption (City) (L/100 km)", "Transmission")
+  
+  kruskal_city_cyl <- run_kruskal_test(data, "Fuel Consumption (City) (L/100 km)", "Cylinders")
+  dunn_city_cyl <- run_dunn_test(data, "Fuel Consumption (City) (L/100 km)", "Cylinders")
+  
+  # Tests pour la consommation de carburant sur autoroute
+  kruskal_hwy_trans <- run_kruskal_test(data, "Fuel Consumption (Hwy) (L/100 km)", "Transmission")
+  dunn_hwy_trans <- run_dunn_test(data, "Fuel Consumption (Hwy) (L/100 km)", "Transmission")
+  
+  kruskal_hwy_cyl <- run_kruskal_test(data, "Fuel Consumption (Hwy) (L/100 km)", "Cylinders")
+  dunn_hwy_cyl <- run_dunn_test(data, "Fuel Consumption (Hwy) (L/100 km)", "Cylinders")
+  
+  # Tests pour la consommation de carburant combinée
+  kruskal_comb_trans <- run_kruskal_test(data, "Fuel Consumption (Comb) (L/100 km)", "Transmission")
+  dunn_comb_trans <- run_dunn_test(data, "Fuel Consumption (Comb) (L/100 km)", "Transmission")
+  
+  kruskal_comb_cyl <- run_kruskal_test(data, "Fuel Consumption (Comb) (L/100 km)", "Cylinders")
+  dunn_comb_cyl <- run_dunn_test(data, "Fuel Consumption (Comb) (L/100 km)", "Cylinders")
+  
+  # Tests pour les émissions de CO2
+  kruskal_co2_trans <- run_kruskal_test(data, "CO2 Emissions (g/km)", "Transmission")
+  dunn_co2_trans <- run_dunn_test(data, "CO2 Emissions (g/km)", "Transmission")
+  
+  kruskal_co2_cyl <- run_kruskal_test(data, "CO2 Emissions (g/km)", "Cylinders")
+  dunn_co2_cyl <- run_dunn_test(data, "CO2 Emissions (g/km)", "Cylinders")
+  
+  # Export des résultats vers des fichiers CSV et TXT pour Kruskal-Wallis
+  write.csv(extract_kruskal_result(kruskal_city_trans), 
+            file = paste0(chemin_donnees, "Kruskal_Wallis_", fichier, "_City_Transmission.csv"))
+  write.table(extract_kruskal_result(kruskal_city_trans), 
+              file = paste0(chemin_donnees, "Kruskal_Wallis_", fichier, "_City_Transmission.txt"), 
+              sep = "\t", row.names = FALSE, quote = FALSE)
+  
+  write.csv(extract_kruskal_result(kruskal_hwy_trans), 
+            file = paste0(chemin_donnees, "Kruskal_Wallis_", fichier, "_Hwy_Transmission.csv"))
+  write.table(extract_kruskal_result(kruskal_hwy_trans), 
+              file = paste0(chemin_donnees, "Kruskal_Wallis_", fichier, "_Hwy_Transmission.txt"), 
+              sep = "\t", row.names = FALSE, quote = FALSE)
+  
+  write.csv(extract_kruskal_result(kruskal_comb_trans), 
+            file = paste0(chemin_donnees, "Kruskal_Wallis_", fichier, "_Comb_Transmission.csv"))
+  write.table(extract_kruskal_result(kruskal_comb_trans), 
+              file = paste0(chemin_donnees, "Kruskal_Wallis_", fichier, "_Comb_Transmission.txt"), 
+              sep = "\t", row.names = FALSE, quote = FALSE)
+  
+  write.csv(extract_kruskal_result(kruskal_co2_trans), 
+            file = paste0(chemin_donnees, "Kruskal_Wallis_", fichier, "_CO2_Transmission.csv"))
+  write.table(extract_kruskal_result(kruskal_co2_trans), 
+              file = paste0(chemin_donnees, "Kruskal_Wallis_", fichier, "_CO2_Transmission.txt"), 
+              sep = "\t", row.names = FALSE, quote = FALSE)
+  
+  # Export des résultats vers des fichiers CSV et TXT pour Dunn
+  write.csv(as.data.frame(dunn_city_trans), 
+            file = paste0(chemin_donnees, "Dunn_", fichier, "_City_Transmission.csv"))
+  write.table(as.data.frame(dunn_city_trans), 
+              file = paste0(chemin_donnees, "Dunn_", fichier, "_City_Transmission.txt"), 
+              sep = "\t", row.names = FALSE, quote = FALSE)
+  
+  write.csv(as.data.frame(dunn_hwy_trans), 
+            file = paste0(chemin_donnees, "Dunn_", fichier, "_Hwy_Transmission.csv"))
+  write.table(as.data.frame(dunn_hwy_trans), 
+              file = paste0(chemin_donnees, "Dunn_", fichier, "_Hwy_Transmission.txt"), 
+              sep = "\t", row.names = FALSE, quote = FALSE)
+  
+  write.csv(as.data.frame(dunn_comb_trans), 
+            file = paste0(chemin_donnees, "Dunn_", fichier, "_Comb_Transmission.csv"))
+  write.table(as.data.frame(dunn_comb_trans), 
+              file = paste0(chemin_donnees, "Dunn_", fichier, "_Comb_Transmission.txt"), 
+              sep = "\t", row.names = FALSE, quote = FALSE)
+  
+  write.csv(as.data.frame(dunn_co2_trans), 
+            file = paste0(chemin_donnees, "Dunn_", fichier, "_CO2_Transmission.csv"))
+  write.table(as.data.frame(dunn_co2_trans), 
+              file = paste0(chemin_donnees, "Dunn_", fichier, "_CO2_Transmission.txt"), 
+              sep = "\t", row.names = FALSE, quote = FALSE)
+  
+  # Message de succès
+  print(paste("Tests de Kruskal-Wallis et de Dunn complétés pour :", fichier))
+}
