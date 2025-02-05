@@ -1,0 +1,91 @@
+# Installation des packages nécessaires
+install.packages("dplyr")
+install.packages("readr")
+install.packages("writexl")
+
+# Charger les bibliothèques
+library(dplyr)
+library(readr)
+library(writexl)
+
+# Spécifier le chemin où se trouvent vos fichiers CSV
+chemin_donnees <- "C:/Users/lalop/OneDrive/Documentos/SCI 1402/"
+
+# Liste des fichiers CSV de données avec espaces dans les noms
+fichiers_donnees <- c('MY2015 Fuel Consumption Ratings.csv', 'MY2016 Fuel Consumption Ratings.csv', 
+                      'MY2017 Fuel Consumption Ratings.csv', 'MY2018 Fuel Consumption Ratings.csv', 
+                      'MY2019 Fuel Consumption Ratings.csv', 'MY2020 Fuel Consumption Ratings.csv', 
+                      'MY2021 Fuel Consumption Ratings.csv', 'MY2022 Fuel Consumption Ratings.csv', 
+                      'MY2023 Fuel Consumption Ratings.csv')
+
+# Fonction pour remplir les cotes CO2
+calculer_cote_CO2 <- function(co2_emissions) {
+  if (is.na(co2_emissions)) {
+    return(NA)
+  } else if (co2_emissions < 100) {
+    return(10)
+  } else if (co2_emissions < 126) {
+    return(9)
+  } else if (co2_emissions < 151) {
+    return(8)
+  } else if (co2_emissions < 176) {
+    return(7)
+  } else if (co2_emissions < 201) {
+    return(6)
+  } else if (co2_emissions < 226) {
+    return(5)
+  } else if (co2_emissions < 251) {
+    return(4)
+  } else if (co2_emissions < 276) {
+    return(3)
+  } else if (co2_emissions < 301) {
+    return(2)
+  } else {
+    return(1)
+  }
+}
+
+# Fonction pour remplir les cotes Smog
+calculer_cote_Smog <- function(cons_ville, cons_autoroute, cons_combinee) {
+  if (is.na(cons_ville) || is.na(cons_autoroute) || is.na(cons_combinee)) {
+    return(NA)
+  } else if (cons_ville < 5 || cons_autoroute < 5 || cons_combinee < 5) {
+    return(10)
+  } else if (cons_combinee < 6.5 || cons_ville < 6.5 || cons_autoroute < 6.5) {
+    return(9)
+  } else if (cons_combinee < 8 || cons_ville < 8 || cons_autoroute < 8) {
+    return(8)
+  } else if (cons_combinee < 10 || cons_ville < 10 || cons_autoroute < 10) {
+    return(7)
+  } else if (cons_combinee < 12 || cons_ville < 12 || cons_autoroute < 12) {
+    return(6)
+  } else if (cons_combinee < 14 || cons_ville < 14 || cons_autoroute < 14) {
+    return(5)
+  } else if (cons_combinee < 16 || cons_ville < 16 || cons_autoroute < 16) {
+    return(4)
+  } else if (cons_combinee < 18 || cons_ville < 18 || cons_autoroute < 18) {
+    return(3)
+  } else if (cons_combinee < 20 || cons_ville < 20 || cons_autoroute < 20) {
+    return(2)
+  } else {
+    return(1)
+  }
+}
+
+# Boucle pour traiter chaque fichier
+for (fichier in fichiers_donnees) {
+  # Charger le fichier CSV avec le chemin complet
+  chemin_complet <- paste0(chemin_donnees, fichier)
+  data <- read_csv(chemin_complet)
+  
+  # Remplir les colonnes CO2 Rating et Smog Rating
+  data <- data %>%
+    mutate(CO2_Rating = sapply(`CO2 Emissions (g/km)`, calculer_cote_CO2),
+           Smog_Rating = mapply(calculer_cote_Smog, `Fuel Consumption (City) (L/100 km)`, 
+                                `Fuel Consumption (Hwy) (L/100 km)`, `Fuel Consumption (Comb) (L/100 km)`))
+  
+  # Sauvegarder le fichier avec les cotes remplies
+  fichier_sortie <- paste0(chemin_donnees, 'Completed_', gsub(" ", "_", fichier))
+  write_csv(data, fichier_sortie)
+  print(paste(fichier_sortie, "a été créé avec succès."))
+}
