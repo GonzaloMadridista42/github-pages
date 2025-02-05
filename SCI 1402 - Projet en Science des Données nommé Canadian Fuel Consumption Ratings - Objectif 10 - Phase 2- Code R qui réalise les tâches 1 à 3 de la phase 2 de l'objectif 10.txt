@@ -1,0 +1,241 @@
+# Installation et chargement des bibliothèques nécessaires
+install.packages("dplyr")
+install.packages("readr")
+install.packages("ggplot2")
+install.packages("car")
+install.packages("FSA")  # Pour le test de Dunn
+
+library(dplyr)
+library(readr)
+library(ggplot2)
+library(car)
+library(FSA)  # Pour le test de Dunn
+
+# Spécifier le chemin où se trouvent vos fichiers CSV
+chemin_donnees <- "C:/Users/lalop/OneDrive/Documentos/SCI 1402/"
+
+# Liste des fichiers CSV des échantillons
+fichiers_echantillons <- c('Sample_1_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2017_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2017_Fuel_Consumption_Ratings.csv',
+                           'Sample_1_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2023_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2023_Fuel_Consumption_Ratings.csv')
+
+# Créer un dataframe vide pour combiner toutes les données
+combined_data <- data.frame()
+
+# Boucle pour lire chaque échantillon et combiner les données
+for (fichier in fichiers_echantillons) {
+  data <- read_csv(paste0(chemin_donnees, fichier))
+  combined_data <- rbind(combined_data, data)
+}
+
+# 1. Calcul des statistiques descriptives par taille du moteur et nombre de cylindres
+stats_summary <- combined_data %>%
+  group_by(`Engine Size (L)`, Cylinders) %>%
+  summarise(
+    Moyenne_City = mean(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE),
+    Mediane_City = median(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE),
+    Ecart_Type_City = sd(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE),
+    Mode_City = as.numeric(names(sort(table(`Fuel Consumption (City) (L/100 km)`), decreasing = TRUE)[1])),
+    Etendue_City = diff(range(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE)),
+    CV_City = sd(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE) / mean(`Fuel Consumption (City) (L/100 km)`, na.rm = TRUE) * 100,
+
+    Moyenne_Hwy = mean(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE),
+    Mediane_Hwy = median(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE),
+    Ecart_Type_Hwy = sd(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE),
+    Mode_Hwy = as.numeric(names(sort(table(`Fuel Consumption (Hwy) (L/100 km)`), decreasing = TRUE)[1])),
+    Etendue_Hwy = diff(range(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE)),
+    CV_Hwy = sd(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE) / mean(`Fuel Consumption (Hwy) (L/100 km)`, na.rm = TRUE) * 100,
+
+    Moyenne_Comb = mean(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE),
+    Mediane_Comb = median(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE),
+    Ecart_Type_Comb = sd(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE),
+    Mode_Comb = as.numeric(names(sort(table(`Fuel Consumption (Comb) (L/100 km)`), decreasing = TRUE)[1])),
+    Etendue_Comb = diff(range(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE)),
+    CV_Comb = sd(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE) / mean(`Fuel Consumption (Comb) (L/100 km)`, na.rm = TRUE) * 100,
+
+    Moyenne_CO2 = mean(`CO2 Emissions (g/km)`, na.rm = TRUE),
+    Mediane_CO2 = median(`CO2 Emissions (g/km)`, na.rm = TRUE),
+    Ecart_Type_CO2 = sd(`CO2 Emissions (g/km)`, na.rm = TRUE),
+    Mode_CO2 = as.numeric(names(sort(table(`CO2 Emissions (g/km)`), decreasing = TRUE)[1])),
+    Etendue_CO2 = diff(range(`CO2 Emissions (g/km)`, na.rm = TRUE)),
+    CV_CO2 = sd(`CO2 Emissions (g/km)`, na.rm = TRUE) / mean(`CO2 Emissions (g/km)`, na.rm = TRUE) * 100
+  )
+
+# Affichage des statistiques descriptives
+print(stats_summary)
+
+# 2. Fonction pour extraire les résultats pertinents de Kruskal-Wallis
+extract_kruskal_results <- function(test_result) {
+  return(data.frame(
+    statistic = test_result$statistic,
+    p_value = test_result$p.value,
+    parameter = test_result$parameter,
+    method = test_result$method
+  ))
+}
+
+# 3. Fonction pour exporter les résultats des tests Kruskal-Wallis et Dunn
+export_results <- function(result_kruskal, result_dunn, sample, year, variable) {
+  # Exporter les résultats du test de Kruskal-Wallis en fichier CSV et TXT
+  write.csv(data.frame(Statistique = result_kruskal$statistic, 
+                       P_value = result_kruskal$p.value),
+            file = paste0(chemin_donnees, "Kruskal_Wallis_", sample, "_Completed_MY", year, "_", variable, "_Fuel_Consumption_Ratings.csv"))
+  write.table(data.frame(Statistique = result_kruskal$statistic, 
+                         P_value = result_kruskal$p.value),
+              file = paste0(chemin_donnees, "Kruskal_Wallis_", sample, "_Completed_MY", year, "_", variable, "_Fuel_Consumption_Ratings.txt"), sep = "\t")
+
+  # Exporter les résultats du test de Dunn en fichier CSV et TXT
+  write.csv(result_dunn$res, 
+            file = paste0(chemin_donnees, "Dunn_", sample, "_Completed_MY", year, "_", variable, "_Fuel_Consumption_Ratings.csv"))
+  write.table(result_dunn$res, 
+              file = paste0(chemin_donnees, "Dunn_", sample, "_Completed_MY", year, "_", variable, "_Fuel_Consumption_Ratings.txt"), sep = "\t")
+}
+
+# 4. Test de Kruskal-Wallis et test de Dunn pour chaque année et chaque échantillon
+for (sample in c("Sample_1", "Sample_2")) {
+  for (year in 2015:2023) {
+    # Filtrer les données pour l'année et l'échantillon
+    data_filtered <- combined_data %>% filter(Year == year)
+    
+    # Tests pour Engine Size
+    kruskal_city_engine <- kruskal.test(`Fuel Consumption (City) (L/100 km)` ~ factor(`Engine Size (L)`), data = data_filtered)
+    dunn_city_engine <- dunnTest(`Fuel Consumption (City) (L/100 km)` ~ factor(`Engine Size (L)`), data = data_filtered, method = "bonferroni")
+    
+    kruskal_hwy_engine <- kruskal.test(`Fuel Consumption (Hwy) (L/100 km)` ~ factor(`Engine Size (L)`), data = data_filtered)
+    dunn_hwy_engine <- dunnTest(`Fuel Consumption (Hwy) (L/100 km)` ~ factor(`Engine Size (L)`), data = data_filtered, method = "bonferroni")
+    
+    kruskal_comb_engine <- kruskal.test(`Fuel Consumption (Comb) (L/100 km)` ~ factor(`Engine Size (L)`), data = data_filtered)
+    dunn_comb_engine <- dunnTest(`Fuel Consumption (Comb) (L/100 km)` ~ factor(`Engine Size (L)`), data = data_filtered, method = "bonferroni")
+    
+    kruskal_co2_engine <- kruskal.test(`CO2 Emissions (g/km)` ~ factor(`Engine Size (L)`), data = data_filtered)
+    dunn_co2_engine <- dunnTest(`CO2 Emissions (g/km)` ~ factor(`Engine Size (L)`), data = data_filtered, method = "bonferroni")
+
+    # Exporter les résultats pour Engine Size
+    export_results(kruskal_city_engine, dunn_city_engine, sample, year, "Engine_Size")
+    export_results(kruskal_hwy_engine, dunn_hwy_engine, sample, year, "Engine_Size")
+    export_results(kruskal_comb_engine, dunn_comb_engine, sample, year, "Engine_Size")
+    export_results(kruskal_co2_engine, dunn_co2_engine, sample, year, "Engine_Size")
+
+    # Tests pour Cylinders
+    kruskal_city_cylinders <- kruskal.test(`Fuel Consumption (City) (L/100 km)` ~ factor(Cylinders), data = data_filtered)
+    dunn_city_cylinders <- dunnTest(`Fuel Consumption (City) (L/100 km)` ~ factor(Cylinders), data = data_filtered, method = "bonferroni")
+    
+    kruskal_hwy_cylinders <- kruskal.test(`Fuel Consumption (Hwy) (L/100 km)` ~ factor(Cylinders), data = data_filtered)
+    dunn_hwy_cylinders <- dunnTest(`Fuel Consumption (Hwy) (L/100 km)` ~ factor(Cylinders), data = data_filtered, method = "bonferroni")
+    
+    kruskal_comb_cylinders <- kruskal.test(`Fuel Consumption (Comb) (L/100 km)` ~ factor(Cylinders), data = data_filtered)
+    dunn_comb_cylinders <- dunnTest(`Fuel Consumption (Comb) (L/100 km)` ~ factor(Cylinders), data = data_filtered, method = "bonferroni")
+    
+    kruskal_co2_cylinders <- kruskal.test(`CO2 Emissions (g/km)` ~ factor(Cylinders), data = data_filtered)
+    dunn_co2_cylinders <- dunnTest(`CO2 Emissions (g/km)` ~ factor(Cylinders), data = data_filtered, method = "bonferroni")
+
+    # Exporter les résultats pour Cylinders
+    export_results(kruskal_city_cylinders, dunn_city_cylinders, sample, year, "Cylinders")
+    export_results(kruskal_hwy_cylinders, dunn_hwy_cylinders, sample, year, "Cylinders")
+    export_results(kruskal_comb_cylinders, dunn_comb_cylinders, sample, year, "Cylinders")
+    export_results(kruskal_co2_cylinders, dunn_co2_cylinders, sample, year, "Cylinders")
+  }
+}
+
+print("Les résultats des tests de Kruskal-Wallis et de Dunn pour Engine Size et Cylinders ont été exportés avec succès.")
+
+# 5. # Fonction pour générer et afficher les graphiques pour une variable donnée
+generate_graphics <- function(data, y_var, y_label, title_base, grouping_var) {
+
+  # 1. Graphiques en lignes simples
+  plot_lignes_simples <- ggplot(data, aes(x = Year, y = !!sym(y_var), color = factor(!!sym(grouping_var)), group = factor(!!sym(grouping_var)))) +
+    geom_line() +
+    geom_point() +
+    labs(title = paste0("Évolution ", title_base, " (Lignes simples)"),
+         x = "Année", y = y_label) +
+    theme_minimal()
+  print(plot_lignes_simples)
+  
+  # 2. Histogrammes sous forme de barres
+  plot_barres <- ggplot(data, aes(x = Year, y = !!sym(y_var), fill = factor(!!sym(grouping_var)))) +
+    geom_bar(stat = "identity", position = "dodge") +
+    labs(title = paste0("Évolution ", title_base, " (Histogramme sous forme de Barres)"),
+         x = "Année", y = y_label) +
+    theme_minimal()
+  print(plot_barres)
+  
+  # 3. Graphiques en aires empilées
+  plot_aires <- ggplot(data, aes(x = Year, y = !!sym(y_var), fill = factor(!!sym(grouping_var)))) +
+    geom_area(position = "stack") +
+    labs(title = paste0("Évolution ", title_base, " (Aires empilées)"),
+         x = "Année", y = y_label) +
+    theme_minimal()
+  print(plot_aires)
+  
+  # 4. Boxplots
+  plot_boxplots <- ggplot(data, aes(x = factor(Year), y = !!sym(y_var), fill = factor(!!sym(grouping_var)))) +
+    geom_boxplot() +
+    labs(title = paste0("Évolution ", title_base, " (Boxplots)"),
+         x = "Année", y = y_label) +
+    theme_minimal()
+  print(plot_boxplots)
+  
+  # 5. Nuages de points
+  plot_nuage_points <- ggplot(data, aes(x = Year, y = !!sym(y_var), color = factor(!!sym(grouping_var)))) +
+    geom_point(size = 2) +
+    labs(title = paste0("Évolution ", title_base, " (Nuage de points)"),
+         x = "Année", y = y_label) +
+    theme_minimal()
+  print(plot_nuage_points)
+  
+  # 6. Barres groupées
+  plot_barres_groupées <- ggplot(data, aes(x = factor(Year), y = !!sym(y_var), fill = factor(!!sym(grouping_var)))) +
+    geom_bar(stat = "identity", position = "dodge") +
+    labs(title = paste0("Évolution ", title_base, " (Barres groupées)"),
+         x = "Année", y = y_label) +
+    theme_minimal()
+  print(plot_barres_groupées)
+}
+
+# 6. Appel de la fonction pour chaque variable de performance
+
+# Appel de la fonction pour chaque variable de performance, basé sur Cylinders
+print("=== Visualisations par nombre de cylindres (Cylinders) ===")
+
+# Consommation en ville (City)
+generate_graphics(combined_data, "Fuel Consumption (City) (L/100 km)", "Consommation en ville (L/100 km)", "consommation_ville", "Cylinders")
+
+# Consommation sur autoroute (Highway)
+generate_graphics(combined_data, "Fuel Consumption (Hwy) (L/100 km)", "Consommation sur autoroute (L/100 km)", "consommation_autoroute", "Cylinders")
+
+# Consommation combinée (Combined)
+generate_graphics(combined_data, "Fuel Consumption (Comb) (L/100 km)", "Consommation combinée (L/100 km)", "consommation_combinée", "Cylinders")
+
+# Émissions de CO2
+generate_graphics(combined_data, "CO2 Emissions (g/km)", "Émissions de CO2 (g/km)", "emissions_co2", "Cylinders")
+
+
+# Appel de la fonction pour chaque variable de performance, basé sur Engine Size
+print("=== Visualisations par taille du moteur (Engine Size) ===")
+
+# Consommation en ville (City)
+generate_graphics(combined_data, "Fuel Consumption (City) (L/100 km)", "Consommation en ville (L/100 km)", "consommation_ville", "Engine Size (L)")
+
+# Consommation sur autoroute (Highway)
+generate_graphics(combined_data, "Fuel Consumption (Hwy) (L/100 km)", "Consommation sur autoroute (L/100 km)", "consommation_autoroute", "Engine Size (L)")
+
+# Consommation combinée (Combined)
+generate_graphics(combined_data, "Fuel Consumption (Comb) (L/100 km)", "Consommation combinée (L/100 km)", "consommation_combinée", "Engine Size (L)")
+
+# Émissions de CO2
+generate_graphics(combined_data, "CO2 Emissions (g/km)", "Émissions de CO2 (g/km)", "emissions_co2", "Engine Size (L)")
