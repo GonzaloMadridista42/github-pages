@@ -1,0 +1,186 @@
+# Installation des packages nécessaires
+install.packages("ggplot2")
+install.packages("dplyr")
+install.packages("readr")
+
+# Charger les bibliothèques
+library(ggplot2)
+library(dplyr)
+library(readr)
+
+# Spécifier le chemin où se trouvent vos fichiers CSV
+chemin_donnees <- "C:/Users/lalop/OneDrive/Documentos/SCI 1402/"
+
+# Liste des fichiers CSV des échantillons
+fichiers_echantillons <- c('Sample_1_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                            'Sample_2_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                            'Sample_1_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                            'Sample_2_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                            'Sample_1_Completed_MY2017_Fuel_Consumption_Ratings.csv', 
+                            'Sample_2_Completed_MY2017_Fuel_Consumption_Ratings.csv',
+                            'Sample_1_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                            'Sample_2_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                            'Sample_1_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                            'Sample_2_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                            'Sample_1_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                            'Sample_2_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                            'Sample_1_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                            'Sample_2_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                            'Sample_1_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                            'Sample_2_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                            'Sample_1_Completed_MY2023_Fuel_Consumption_Ratings.csv', 
+                            'Sample_2_Completed_MY2023_Fuel_Consumption_Ratings.csv')
+
+# Charger tous les échantillons et les combiner en un seul dataframe
+tendances_annuelles <- data.frame()
+
+for (fichier in fichiers_echantillons) {
+  data <- read_csv(paste0(chemin_donnees, fichier))
+  
+  # Convertir la colonne Year en caractère pour éviter les erreurs de type lors du bind_rows
+  data <- data %>% 
+    mutate(Year = as.character(Year)) %>% 
+    select(Year, `Fuel Consumption (City) (L/100 km)`, `Fuel Consumption (Hwy) (L/100 km)`, `Fuel Consumption (Comb) (L/100 km)`, `CO2 Emissions (g/km)`)
+  
+  # Ajouter les données au dataframe global
+  tendances_annuelles <- bind_rows(tendances_annuelles, data)
+}
+
+# Afficher les premières lignes pour vérifier que les données sont correctes
+print(head(tendances_annuelles))
+
+# 1. Graphique de lignes simples avec des points pour chaque type de consommation
+# Pour la consommation de carburant en Ville
+ggplot(tendances_annuelles, aes(x = Year)) +
+  geom_line(aes(y = `Fuel Consumption (City) (L/100 km)`, color = "Ville"), group = 1, linewidth = 1) +
+  geom_point(aes(y = `Fuel Consumption (City) (L/100 km)`, color = "Ville"), size = 2) +
+  labs(title = "Graphique à lignes avec points - Tendances de la consommation de carburant en Ville", 
+       x = "Année", y = "Consommation de carburant (L/100 km)", color = "Type de consommation") +
+  scale_x_discrete(limits = as.character(2015:2023)) +
+  theme_minimal()
+
+# Pour la consommation de carburant sur Autoroute
+ggplot(tendances_annuelles, aes(x = Year)) +
+  geom_line(aes(y = `Fuel Consumption (Hwy) (L/100 km)`, color = "Autoroute"), group = 1, linewidth = 1) +
+  geom_point(aes(y = `Fuel Consumption (Hwy) (L/100 km)`, color = "Autoroute"), size = 2) +
+  labs(title = "Graphique à lignes avec points - Tendances de la consommation de carburant sur Autoroute", 
+       x = "Année", y = "Consommation de carburant (L/100 km)", color = "Type de consommation") +
+  scale_x_discrete(limits = as.character(2015:2023)) +
+  theme_minimal()
+
+# Pour la consommation de carburant Combiné (sur Ville et sur Autoroute)
+ggplot(tendances_annuelles, aes(x = Year)) +
+  geom_line(aes(y = `Fuel Consumption (Comb) (L/100 km)`, color = "Combinée"), group = 1, linewidth = 1) +
+  geom_point(aes(y = `Fuel Consumption (Comb) (L/100 km)`, color = "Combinée"), size = 2) +
+  labs(title = "Graphique à lignes avec points - Tendances de la consommation de carburant Combiné (sur Ville et sur Autoroute)", 
+       x = "Année", y = "Consommation de carburant (L/100 km)", color = "Type de consommation") +
+  scale_x_discrete(limits = as.character(2015:2023)) +
+  theme_minimal()
+
+# Pour les émissions de CO2
+ggplot(tendances_annuelles, aes(x = Year)) +
+  geom_line(aes(y = `CO2 Emissions (g/km)`, color = "Émissions de CO2"), group = 1, linewidth = 1) +
+  geom_point(aes(y = `CO2 Emissions (g/km)`, color = "Émissions de CO2"), size = 2) +
+  labs(title = "Graphique à lignes avec points - Tendances des Émissions de CO2", 
+       x = "Année", y = "Émissions de CO2 (g/km)", color = "Type d'émission") +
+  scale_x_discrete(limits = as.character(2015:2023)) +
+  theme_minimal()
+
+# 2. Boxplots pour chaque type de consommation
+# Boxplot pour la consommation de carburant en Ville
+ggplot(tendances_annuelles, aes(x = Year)) +
+  geom_boxplot(aes(y = `Fuel Consumption (City) (L/100 km)`, fill = "Ville")) +
+  labs(title = "Boxplot de la consommation de carburant en Ville", 
+       x = "Année", y = "Consommation de carburant (L/100 km)", fill = "Type de consommation") +
+  scale_fill_manual(values = c("Ville" = "steelblue")) +
+  theme_minimal()
+
+# Boxplot pour la consommation de carburant sur Autoroute
+ggplot(tendances_annuelles, aes(x = Year)) +
+  geom_boxplot(aes(y = `Fuel Consumption (Hwy) (L/100 km)`, fill = "Autoroute")) +
+  labs(title = "Boxplot de la consommation de carburant sur Autoroute", 
+       x = "Année", y = "Consommation de carburant (L/100 km)", fill = "Type de consommation") +
+  scale_fill_manual(values = c("Autoroute" = "darkorange")) +
+  theme_minimal()
+
+# Boxplot pour la consommation de carburant Combinée
+ggplot(tendances_annuelles, aes(x = Year)) +
+  geom_boxplot(aes(y = `Fuel Consumption (Comb) (L/100 km)`, fill = "Combinée")) +
+  labs(title = "Boxplot de la consommation de carburant Combinée", 
+       x = "Année", y = "Consommation de carburant (L/100 km)", fill = "Type de consommation") +
+  scale_fill_manual(values = c("Combinée" = "green")) +
+  theme_minimal()
+
+# Boxplot pour les émissions de CO2
+ggplot(tendances_annuelles, aes(x = Year)) +
+  geom_boxplot(aes(y = `CO2 Emissions (g/km)`, fill = "Émissions de CO2")) +
+  labs(title = "Boxplot des Émissions de CO2", 
+       x = "Année", y = "Émissions de CO2 (g/km)", fill = "Type d'émission") +
+  scale_fill_manual(values = c("Émissions de CO2" = "red")) +
+  theme_minimal()
+
+# 3. Nuages de points pour chaque type de consommation
+# Nuage de points pour la consommation de carburant en Ville
+ggplot(tendances_annuelles, aes(x = Year)) +
+  geom_point(aes(y = `Fuel Consumption (City) (L/100 km)`, color = "Ville"), size = 3) +
+  labs(title = "Nuage de Points de la consommation de carburant en Ville", 
+       x = "Année", y = "Consommation de carburant (L/100 km)", color = "Type de consommation") +
+  scale_color_manual(values = c("Ville" = "steelblue")) +
+  theme_minimal()
+
+# Nuage de points pour la consommation de carburant sur Autoroute
+ggplot(tendances_annuelles, aes(x = Year)) +
+  geom_point(aes(y = `Fuel Consumption (Hwy) (L/100 km)`, color = "Autoroute"), size = 3) +
+  labs(title = "Nuage de Points de la consommation de carburant sur Autoroute", 
+       x = "Année", y = "Consommation de carburant (L/100 km)", color = "Type de consommation") +
+  scale_color_manual(values = c("Autoroute" = "darkorange")) +
+  theme_minimal()
+
+# Nuage de points pour la consommation de carburant Combinée
+ggplot(tendances_annuelles, aes(x = Year)) +
+  geom_point(aes(y = `Fuel Consumption (Comb) (L/100 km)`, color = "Combinée"), size = 3) +
+  labs(title = "Nuage de Points de la consommation de carburant Combinée", 
+       x = "Année", y = "Consommation de carburant (L/100 km)", color = "Type de consommation") +
+  scale_color_manual(values = c("Combinée" = "green")) +
+  theme_minimal()
+
+# Nuage de points pour les émissions de CO2
+ggplot(tendances_annuelles, aes(x = Year)) +
+  geom_point(aes(y = `CO2 Emissions (g/km)`, color = "Émissions de CO2"), size = 3) +
+  labs(title = "Nuage de Points des Émissions de CO2", 
+       x = "Année", y = "Émissions de CO2 (g/km)", color = "Type d'émission") +
+  scale_color_manual(values = c("Émissions de CO2" = "red")) +
+  theme_minimal()
+
+# 4. Graphiques à barres groupées pour chaque type de consommation
+# Graphiques à barres groupées pour la consommation de carburant en Ville
+ggplot(tendances_annuelles, aes(x = Year)) +
+  geom_bar(aes(y = `Fuel Consumption (City) (L/100 km)`, fill = "Ville"), stat = "identity", position = "dodge") +
+  labs(title = "Graphiques à Barres Groupées de la consommation de carburant en Ville", 
+       x = "Année", y = "Consommation de carburant (L/100 km)", fill = "Type de consommation") +
+  scale_fill_manual(values = c("Ville" = "steelblue")) +
+  theme_minimal()
+
+# Graphiques à barres groupées pour la consommation de carburant sur Autoroute
+ggplot(tendances_annuelles, aes(x = Year)) +
+  geom_bar(aes(y = `Fuel Consumption (Hwy) (L/100 km)`, fill = "Autoroute"), stat = "identity", position = "dodge") +
+  labs(title = "Graphiques à Barres Groupées de la consommation de carburant sur Autoroute", 
+       x = "Année", y = "Consommation de carburant (L/100 km)", fill = "Type de consommation") +
+  scale_fill_manual(values = c("Autoroute" = "darkorange")) +
+  theme_minimal()
+
+# Graphiques à barres groupées pour la consommation de carburant Combinée
+ggplot(tendances_annuelles, aes(x = Year)) +
+  geom_bar(aes(y = `Fuel Consumption (Comb) (L/100 km)`, fill = "Combinée"), stat = "identity", position = "dodge") +
+  labs(title = "Graphiques à Barres Groupées de la consommation de carburant Combinée", 
+       x = "Année", y = "Consommation de carburant (L/100 km)", fill = "Type de consommation") +
+  scale_fill_manual(values = c("Combinée" = "green")) +
+  theme_minimal()
+
+# Graphiques à barres groupées pour les émissions de CO2
+ggplot(tendances_annuelles, aes(x = Year)) +
+  geom_bar(aes(y = `CO2 Emissions (g/km)`, fill = "Émissions de CO2"), stat = "identity", position = "dodge") +
+  labs(title = "Graphiques à Barres Groupées des Émissions de CO2", 
+       x = "Année", y = "Émissions de CO2 (g/km)", fill = "Type d'émission") +
+  scale_fill_manual(values = c("Émissions de CO2" = "red")) +
+  theme_minimal()
