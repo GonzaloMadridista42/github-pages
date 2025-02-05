@@ -1,0 +1,76 @@
+# Installation et chargement des bibliothèques nécessaires
+install.packages("car")
+install.packages("dplyr")
+install.packages("readr")
+library(car)
+library(dplyr)
+library(readr)
+
+# Spécifier le chemin où se trouvent vos fichiers CSV
+chemin_donnees <- "C:/Users/lalop/OneDrive/Documentos/SCI 1402/"
+
+# Liste des fichiers CSV des échantillons
+fichiers_echantillons <- c('Sample_1_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2017_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2017_Fuel_Consumption_Ratings.csv',
+                           'Sample_1_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2023_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2023_Fuel_Consumption_Ratings.csv')
+
+# Fonction pour effectuer une régression linéaire avec interactions
+modele_interactions <- function(data, var_dep, fichier_sortie) {
+  # Création du modèle avec interaction entre la taille du moteur, le nombre de cylindres et la transmission
+  modele <- lm(as.formula(paste(var_dep, "~ `Engine Size (L)` * Cylinders * Transmission")), data = data)
+  
+  # Afficher le résumé du modèle dans la console
+  print(summary(modele))
+  
+  # Exporter les résultats dans un fichier texte
+  writeLines(capture.output(summary(modele)), paste0(chemin_donnees, fichier_sortie, ".txt"))
+  
+  # Exporter les coefficients du modèle dans un fichier CSV
+  resultats <- summary(modele)$coefficients
+  write_csv(as.data.frame(resultats), paste0(chemin_donnees, fichier_sortie, ".csv"))
+  
+  print(paste(fichier_sortie, "a été créé avec succès."))
+}
+
+# Boucle pour traiter chaque échantillon et effectuer les analyses de régression avec interactions
+for (fichier in fichiers_echantillons) {
+  # Charger l'échantillon CSV
+  data <- read_csv(paste0(chemin_donnees, fichier))
+  
+  # Créer le nom de fichier de sortie pour les résultats avec le format souhaité
+  fichier_sortie_city <- paste0("Simple_Linear_Regression_Interactions_City_", gsub(" ", "_", fichier))
+  fichier_sortie_hwy <- paste0("Simple_Linear_Regression_Interactions_Hwy_", gsub(" ", "_", fichier))
+  fichier_sortie_comb <- paste0("Simple_Linear_Regression_Interactions_Comb_", gsub(" ", "_", fichier))
+  fichier_sortie_co2 <- paste0("Simple_Linear_Regression_Interactions_CO2_", gsub(" ", "_", fichier))
+  
+  # Effectuer les régressions avec interactions pour la consommation en ville
+  print(paste("Analyse des interactions pour la consommation en ville pour", fichier, ":"))
+  modele_interactions(data, "`Fuel Consumption (City) (L/100 km)`", fichier_sortie_city)
+  
+  # Effectuer les régressions avec interactions pour la consommation sur autoroute
+  print(paste("Analyse des interactions pour la consommation sur autoroute pour", fichier, ":"))
+  modele_interactions(data, "`Fuel Consumption (Hwy) (L/100 km)`", fichier_sortie_hwy)
+  
+  # Effectuer les régressions avec interactions pour la consommation combinée
+  print(paste("Analyse des interactions pour la consommation combinée pour", fichier, ":"))
+  modele_interactions(data, "`Fuel Consumption (Comb) (L/100 km)`", fichier_sortie_comb)
+  
+  # Effectuer les régressions avec interactions pour les émissions de CO2
+  print(paste("Analyse des interactions pour les émissions de CO2 pour", fichier, ":"))
+  modele_interactions(data, "`CO2 Emissions (g/km)`", fichier_sortie_co2)
+}
