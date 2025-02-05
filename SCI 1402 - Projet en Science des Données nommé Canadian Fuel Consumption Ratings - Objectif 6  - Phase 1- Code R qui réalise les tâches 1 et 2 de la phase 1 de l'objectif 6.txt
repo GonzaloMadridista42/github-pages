@@ -1,0 +1,56 @@
+# Installation et chargement des bibliothèques nécessaires
+install.packages("dplyr")
+install.packages("readr")
+
+library(dplyr)
+library(readr)
+
+# Spécifier le chemin où se trouvent vos fichiers CSV
+chemin_donnees <- "C:/Users/lalop/OneDrive/Documentos/SCI 1402/"
+
+# Liste des fichiers CSV des échantillons
+fichiers_echantillons <- c('Sample_1_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2017_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2017_Fuel_Consumption_Ratings.csv',
+                           'Sample_1_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2023_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2023_Fuel_Consumption_Ratings.csv')
+
+# Créer un dataframe vide pour combiner toutes les données
+combined_data <- data.frame()
+
+# Boucle pour lire chaque échantillon et combiner les données
+for (fichier in fichiers_echantillons) {
+  data <- read_csv(paste0(chemin_donnees, fichier))
+  combined_data <- rbind(combined_data, data)
+}
+
+# Classification des véhicules par marque (Make) et modèle (Model)
+vehicules_groupes <- combined_data %>%
+  group_by(Make, Model) %>%
+  summarize(Nombre_Vehicules = n()) %>%
+  arrange(desc(Nombre_Vehicules))
+
+# Afficher les résultats dans la console sans limitation
+print(vehicules_groupes)
+
+# Sauvegarder les résultats dans un fichier CSV avec toutes les données
+write_csv(vehicules_groupes, paste0(chemin_donnees, "Vehicles_Classification_MaKes_Models_Years_2015_2023.csv"))
+
+# Sauvegarder les résultats dans un fichier texte avec toutes les données
+writeLines(capture.output(print(vehicules_groupes, n = Inf)), paste0(chemin_donnees, "Vehicles_Classification_MaKes_Models_Years_2015_2023.txt"))
+
+# Message de réussite
+print("Classification des marques et modèles réalisée et exportée avec succès.")
