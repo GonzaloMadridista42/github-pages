@@ -1,0 +1,73 @@
+# Charger les bibliothèques nécessaires
+library(dplyr)
+library(readr)
+
+# Spécifier le chemin où se trouvent vos fichiers CSV
+chemin_donnees <- "C:/Users/lalop/OneDrive/Documentos/SCI 1402/"
+
+# Liste des fichiers CSV des échantillons
+fichiers_echantillons <- c('Sample_1_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2017_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2017_Fuel_Consumption_Ratings.csv',
+                           'Sample_1_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2023_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2023_Fuel_Consumption_Ratings.csv')
+
+# Fonction pour effectuer l'analyse de corrélation et exporter les résultats
+analyse_correlation <- function(data, var_x, var_y, fichier_sortie) {
+  # Formule de corrélation
+  formule <- as.formula(paste0("`", var_y, "` ~ `", var_x, "`"))
+  
+  # Calculer la corrélation de Pearson
+  correlation <- cor(data[[var_x]], data[[var_y]], method = "pearson")
+  
+  # Résultats à afficher et exporter
+  resultats <- data.frame(Variable_X = var_x, Variable_Y = var_y, Correlation = correlation)
+  
+  # Exporter les résultats vers un fichier CSV
+  write.csv(resultats, file.path(chemin_donnees, paste0(fichier_sortie, ".csv")), row.names = FALSE)
+  
+  # Exporter les résultats vers un fichier texte
+  sink(file.path(chemin_donnees, paste0(fichier_sortie, ".txt")))
+  print(paste("Corrélation entre", var_x, "et", var_y, ":", correlation))
+  sink()
+  
+  # Afficher les résultats dans la console
+  print(resultats)
+}
+
+# Boucle pour traiter chaque échantillon et effectuer les analyses
+for (fichier in fichiers_echantillons) {
+  # Charger les données
+  data <- read_csv(file.path(chemin_donnees, fichier))
+  
+  # Créer des noms de fichiers de sortie pour chaque type de consommation
+  fichier_sortie_city <- gsub(".csv", "_Correlation_Pearson_City", fichier)
+  fichier_sortie_hwy <- gsub(".csv", "_Correlation_Pearson_Hwy", fichier)
+  fichier_sortie_comb <- gsub(".csv", "_Correlation_Pearson_Comb", fichier)
+  
+  # Effectuer l'analyse de corrélation pour chaque type de consommation
+  print(paste("Analyse de corrélation pour la consommation en ville pour", fichier, ":"))
+  analyse_correlation(data, "Fuel Consumption (City) (L/100 km)", "CO2 Emissions (g/km)", fichier_sortie_city)
+  
+  print(paste("Analyse de corrélation pour la consommation sur autoroute pour", fichier, ":"))
+  analyse_correlation(data, "Fuel Consumption (Hwy) (L/100 km)", "CO2 Emissions (g/km)", fichier_sortie_hwy)
+  
+  print(paste("Analyse de corrélation pour la consommation combinée pour", fichier, ":"))
+  analyse_correlation(data, "Fuel Consumption (Comb) (L/100 km)", "CO2 Emissions (g/km)", fichier_sortie_comb)
+}
+
+
+
