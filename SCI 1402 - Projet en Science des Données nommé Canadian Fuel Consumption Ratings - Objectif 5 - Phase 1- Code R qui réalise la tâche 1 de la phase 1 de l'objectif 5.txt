@@ -1,0 +1,150 @@
+# Installation et chargement des bibliothèques nécessaires
+install.packages("dunn.test")
+install.packages("ggplot2")
+install.packages("dplyr")
+install.packages("readr")
+install.packages("writexl")
+
+library(dunn.test)
+library(ggplot2)
+library(dplyr)
+library(readr)
+library(writexl)
+
+# Spécifier le chemin où se trouvent vos fichiers CSV
+chemin_donnees <- "C:/Users/lalop/OneDrive/Documentos/SCI 1402/"
+
+# Liste des fichiers CSV des échantillons
+fichiers_echantillons <- c('Sample_1_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2015_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2016_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2017_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2017_Fuel_Consumption_Ratings.csv',
+                           'Sample_1_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2018_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2019_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2020_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2021_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2022_Fuel_Consumption_Ratings.csv', 
+                           'Sample_1_Completed_MY2023_Fuel_Consumption_Ratings.csv', 
+                           'Sample_2_Completed_MY2023_Fuel_Consumption_Ratings.csv')
+
+# Créer des dataframes vides pour stocker les résultats globaux
+resultats_kruskal_global <- data.frame()
+resultats_dunn_global <- data.frame()
+
+# Fonction pour effectuer le test de Kruskal-Wallis pour chaque année
+kruskal_wallis_test <- function(data, fichier_sortie_txt, fichier_sortie_csv) {
+  # Tester pour chaque année individuellement
+  resultats_kw_list <- list()
+  for (annee in unique(data$Year)) {
+    data_annee <- filter(data, Year == annee)
+    
+    # Test de Kruskal-Wallis pour CO2 et Smog pour cette année
+    resultats_kw_co2 <- kruskal.test(`CO2 Rating` ~ `Fuel Type`, data = data_annee)
+    resultats_kw_smog <- kruskal.test(`Smog Rating` ~ `Fuel Type`, data = data_annee)
+    
+    # Exporter les résultats dans un fichier texte
+    writeLines(capture.output(resultats_kw_co2, resultats_kw_smog), paste0(chemin_donnees, fichier_sortie_txt, "_Year_", annee, ".txt"))
+    
+    # Ajouter les résultats à la liste
+    resultats_kw_list[[paste0("Year_", annee)]] <- list(co2 = resultats_kw_co2, smog = resultats_kw_smog)
+    
+    # Ajouter les résultats à un dataframe pour chaque année
+    resultats_kw_df <- data.frame(
+      Year = annee,
+      Test = c("Kruskal-Wallis CO2", "Kruskal-Wallis Smog"),
+      Statistic = c(resultats_kw_co2$statistic, resultats_kw_smog$statistic),
+      P_Value = c(resultats_kw_co2$p.value, resultats_kw_smog$p.value)
+    )
+    
+    # Ajouter les résultats au dataframe global
+    resultats_kruskal_global <<- rbind(resultats_kruskal_global, resultats_kw_df)
+  }
+  
+  # Exporter les résultats pour toutes les années dans un fichier CSV
+  write_csv(resultats_kruskal_global, paste0(chemin_donnees, fichier_sortie_csv, ".csv"))
+  
+  # Message de réussite
+  print(paste("Test de Kruskal-Wallis réussi pour", fichier_sortie_csv))
+  
+  return(resultats_kw_list)
+}
+
+# Fonction pour effectuer le test de Dunn pour chaque année
+test_dunn <- function(data, fichier_sortie_txt, fichier_sortie_csv) {
+  # Tester pour chaque année individuellement
+  resultats_dunn_list <- list()
+  for (annee in unique(data$Year)) {
+    data_annee <- filter(data, Year == annee)
+    
+    # Test de Dunn pour les cotes CO2 et Smog
+    resultats_dunn_co2 <- dunn.test(data_annee$`CO2 Rating`, data_annee$`Fuel Type`, method = "bonferroni")
+    resultats_dunn_smog <- dunn.test(data_annee$`Smog Rating`, data_annee$`Fuel Type`, method = "bonferroni")
+    
+    # Exporter les résultats dans un fichier texte
+    writeLines(capture.output(resultats_dunn_co2, resultats_dunn_smog), paste0(chemin_donnees, fichier_sortie_txt, "_Year_", annee, ".txt"))
+    
+    # Ajouter les résultats à la liste
+    resultats_dunn_list[[paste0("Year_", annee)]] <- list(co2 = resultats_dunn_co2, smog = resultats_dunn_smog)
+    
+    # Ajouter les résultats à un dataframe pour chaque année
+    resultats_dunn_df <- data.frame(
+      Year = annee,
+      Test = c("Dunn Test CO2", "Dunn Test Smog"),
+      P_Value = c(resultats_dunn_co2$P.adjusted, resultats_dunn_smog$P.adjusted)
+    )
+    
+    # Ajouter les résultats au dataframe global
+    resultats_dunn_global <<- rbind(resultats_dunn_global, resultats_dunn_df)
+  }
+  
+  # Exporter les résultats pour toutes les années dans un fichier CSV
+  write_csv(resultats_dunn_global, paste0(chemin_donnees, fichier_sortie_csv, ".csv"))
+  
+  # Message de réussite
+  print(paste("Test de Dunn réussi pour", fichier_sortie_csv))
+  
+  return(resultats_dunn_list)
+}
+
+# Boucle pour traiter chaque échantillon et effectuer les tests
+for (fichier in fichiers_echantillons) {
+  # Charger l'échantillon CSV
+  data <- read_csv(paste0(chemin_donnees, fichier))
+  
+  # Créer les noms de fichiers de sortie pour les résultats
+  fichier_sortie_kw <- paste0("Kruskal_Wallis_", gsub(" ", "_", fichier))
+  fichier_sortie_dunn <- paste0("Dunn_Test_", gsub(" ", "_", fichier))
+  
+  # Effectuer le test de Kruskal-Wallis pour les cotes CO2 et Smog par année
+  print(paste("Test de Kruskal-Wallis pour", fichier, ":"))
+  resultats_kw <- kruskal_wallis_test(data, fichier_sortie_kw, fichier_sortie_kw)
+  
+  # Effectuer le test de Dunn pour les cotes CO2 et Smog par année
+  print(paste("Test de Dunn pour", fichier, ":"))
+  resultats_dunn <- test_dunn(data, fichier_sortie_dunn, fichier_sortie_dunn)
+}
+
+# Exporter les résultats globaux des tests Kruskal-Wallis
+fichier_sortie_global_kruskal_csv <- paste0(chemin_donnees, "Kruskal_Wallis_Results_Global.csv")
+fichier_sortie_global_kruskal_txt <- paste0(chemin_donnees, "Kruskal_Wallis_Results_Global.txt")
+
+write_csv(resultats_kruskal_global, fichier_sortie_global_kruskal_csv)
+writeLines(capture.output(print(resultats_kruskal_global)), fichier_sortie_global_kruskal_txt)
+
+# Exporter les résultats globaux des tests de Dunn
+fichier_sortie_global_dunn_csv <- paste0(chemin_donnees, "Dunn_Test_Results_Global.csv")
+fichier_sortie_global_dunn_txt <- paste0(chemin_donnees, "Dunn_Test_Results_Global.txt")
+
+write_csv(resultats_dunn_global, fichier_sortie_global_dunn_csv)
+writeLines(capture.output(print(resultats_dunn_global)), fichier_sortie_global_dunn_txt)
+
+# Message de confirmation d'exportation globale
+print(paste(fichier_sortie_global_kruskal_csv, "et", fichier_sortie_global_kruskal_txt, "ont été créés avec succès."))
+print(paste(fichier_sortie_global_dunn_csv, "et", fichier_sortie_global_dunn_txt, "ont été créés avec succès."))
